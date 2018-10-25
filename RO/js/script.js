@@ -1,4 +1,5 @@
-﻿var game = new Phaser.Game(800, 400, Phaser.CANVAS, 'phaser-id',
+﻿
+var game = new Phaser.Game(800, 400, Phaser.CANVAS, 'phaser-id',
  { preload: preload, create: create, update: update, render:render});
 
 function preload() {
@@ -61,6 +62,7 @@ var etapa = {
 
 //Configuração de teclas de entrada de dados
 function config_buttons(){
+	
 
 	console.log(etapa);
 	//config teclas
