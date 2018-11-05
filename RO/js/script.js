@@ -1,5 +1,4 @@
-﻿
-var game = new Phaser.Game(800, 400, Phaser.CANVAS, 'phaser-id',
+﻿var game = new Phaser.Game(800, 400, Phaser.CANVAS, 'phaser-id',
  { preload: preload, create: create, update: update, render:render});
 
 function preload() {
@@ -13,22 +12,12 @@ var adjPesos = [];
 var auxAdj=[];
 var aux = [];
 var setLP = [];
-var over = false;
+var overTap = false;
 var currentPoint;
 var centroid;
 var inputType;
 var lineOn=false;
 var enterKey;
-var um;
-var dois;
-var tres;
-var quatro;
-var cinco;
-var seis;
-var sete;
-var oito;
-var nove;
-var zero;
 var connection = 0;
 var grafo = [];
 var linha = [];
@@ -40,16 +29,6 @@ var enterOri;
 var enterDest;
 var ori='';
 var dest='';
-var b1;
-var b2;
-var b3;
-var b4;
-var b5;
-var b6;
-var b7;
-var b8;
-var b9;
-var b0;
 var style;
 var show=1;
 var avaliar = false;
@@ -61,38 +40,13 @@ var etapa = {
 
 //Configuração de teclas de entrada de dados
 function config_buttons(){
-	
-
 	console.log(etapa);
 	//config teclas
-		enterOri = game.input.keyboard.addKey(Phaser.Keyboard.O);
-		enterDest = game.input.keyboard.addKey(Phaser.Keyboard.D);
-		enterStop = game.input.keyboard.addKey(Phaser.Keyboard.S);
-		spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-		enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
-		// config buttons na view
-		b0 = game.add.button(150, 180, 'button', actionOnClick, this,2,1,0,b0);
-		b1 = game.add.button(30, 30, 'button', actionOnClick, this,2,1,0,b1);
-		b2 = game.add.button(150, 30, 'button', actionOnClick, this,2,1,0,b2);
-		b3 = game.add.button(270, 30, 'button', actionOnClick, this,2,1,0,b3);
-		b4 = game.add.button(30, 80, 'button', actionOnClick, this,2,1,0,b4);
-		b5 = game.add.button(150, 80, 'button', actionOnClick, this,2,1,0,b5);
-		b6 = game.add.button(270, 80, 'button', actionOnClick, this,2,1,0,b6);
-		b7 = game.add.button(30, 130, 'button', actionOnClick, this,2,1,0,b7);
-		b8 = game.add.button(150, 130, 'button', actionOnClick, this,2,1,0,b8);
-		b9 = game.add.button(270, 130, 'button', actionOnClick, this,2,1,0,b9);
-		//config texto dos botoes
-		var t1 = game.add.text(60,28, 1, style );
-		var t2 = game.add.text(180,28, 2, style );
-		var t3 = game.add.text(300,28, 3, style );
-		var t4 = game.add.text(60,78, 4, style );
-		var t5 = game.add.text(180,78, 5, style );
-		var t6 = game.add.text(300,78, 6, style );
-		var t7 = game.add.text(60,128, 7, style );
-		var t8 = game.add.text(180,128, 8, style );
-		var t9 = game.add.text(300,128, 9, style );
-		var t0 = game.add.text(180,178, 0, style );
-	
+	enterOri = game.input.keyboard.addKey(Phaser.Keyboard.O);
+	enterDest = game.input.keyboard.addKey(Phaser.Keyboard.D);
+	enterStop = game.input.keyboard.addKey(Phaser.Keyboard.S);
+	spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+	enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
 }
 
 // funções de atualização
@@ -110,7 +64,6 @@ function create() {
 	currentPoint = game.add.image(10, 10, 'centroid');
 	currentPoint.anchor.set(0.5);
 	currentPoint.alpha = 0.9;
-	currentPoint.transparent = true;
 	game.input.onTap.add(onTapHandler, this);
 }
 
@@ -126,6 +79,7 @@ function update() {
 	        currentPoint.inputEnabled=false;
 	        etapa.fase=2;
 			etapa.em_execucao = 0;	
+			overTap= true;
 		}
 		break;
 		case 2:
@@ -144,9 +98,9 @@ function update() {
             
             for(var k=0;k<auxAdj.length;k++){
                 for(var i=0;i<points.length;i++){
-                    if( (auxAdj[k][0]-1) == i){
-                        grafo[i][(auxAdj[k][1]-1)] =parseInt(auxAdj[k][2]);
-                        grafo[(auxAdj[k][1]-1)][i] =parseInt(auxAdj[k][2]);
+                    if( (auxAdj[k].u-1) == i){
+                        grafo[i][(auxAdj[k].v-1)] =parseInt(auxAdj[k].peso);
+                        grafo[(auxAdj[k].v-1)][i] =parseInt(auxAdj[k].peso);
                     }
                 }
             }
@@ -173,8 +127,17 @@ function update() {
     
     if(calculo_final){
     	if(enterOri.isDown){
-			enterOri.isDown=false;
-			if(peso==""&& ori==""){
+			//enterOri.isDown=false;
+			var selection ;
+            do{
+    			selection = parseInt(prompt("Please enter a number from 1 to " + points.length, "peso"), 10);
+			}while(isNaN(selection) || selection > points.length || selection < 1);
+			peso = selection;
+			ori = peso; 
+			etapa.fase = 4;
+			etapa.em_execucao =0;
+			show =1;
+			/*if(peso==""&& ori==""){
 				alert("desculpe! você não informou a origem ainda? tente novamente por favor.");
 			}
 			
@@ -184,10 +147,22 @@ function update() {
 				etapa.em_execucao =0;
 				show =1;
 				peso = '';	
-			}
+			}*/
         }
         if(enterDest.isDown){
-            if(peso==""&& dest==""){
+
+        	var selection ;
+            do{
+    			selection = parseInt(prompt("Please enter a number from 1 to " + points.length, "peso"), 10);
+			}while(isNaN(selection) || selection > points.length || selection < 1);
+			peso = selection;
+			dest = peso; 
+			etapa.fase = 5;
+			etapa.em_execucao =0;
+			show =1;
+			peso = '';	
+            
+            /*if(peso==""&& dest==""){
 				alert("desculpe! você não informou o destino ainda? tente novamente por favor.");
 			}
 		
@@ -198,6 +173,7 @@ function update() {
 				show =1;
 				peso = '';	
 			}
+			*/
         }
     }
     exibirLinhas();
@@ -209,9 +185,9 @@ function render(){
         game.debug.text(index, child.x - 10,child.y + 25, style_verticetxt.color,style_verticetxt.font);
         index+=1;
     });
-    
+    //setar um texto exatamento no meio da distancia entre os pontos
     for(var i=0;i<setLP.length;i++){
-         game.debug.text(auxAdj[i][2], (setLP[i][1][0].x+setLP[i][1][1].x)/2,(setLP[i][1][0].y+setLP[i][1][1].y)/2, "white", "20px Courier");
+         game.debug.text(auxAdj[i].peso, (setLP[i][1][0].x+setLP[i][1][1].x)/2,(setLP[i][1][0].y+setLP[i][1][1].y)/2, "white", "20px Courier");
     }
     for(var i =0;i<setLP.length;i++){
          game.debug.geom(setLP[i][0]);
@@ -234,9 +210,9 @@ function projeto(){
 "\nDiga o valor do peso e clique nos dois vertices que deseja criar a aresta."+
 "\n\nPara encerrar,aperte a tecla \"s\".");
 		}else if (etapa.fase == 3){
-			alert("Agora informe a origem pelo teclado virtual ao lado, em seguinda aperte O. ");
+			alert("Quando estiver pronto, aperte O e informe o ponto de origem.");
 		}else if(etapa.fase == 4){
-			alert("Agora informe o destino pelo teclado virtual ao lado, em seguinda aperte D. ");
+			alert("Quando estiver pronto, aperte D e informe o ponto de destino.");
 		}
 		else {
 			alert("Analise o LOG de saída.");
@@ -251,42 +227,12 @@ function atualizarLog(strvalue){
 	document.getElementById("logview").textContent=strvalue;
 }
 function actionOnClick (valor) {
-    
-    if(valor==b0){
-        peso=peso.concat('0');
-       
-    }else if(valor==b1){
-        peso=peso.concat('1');
-        
-    }else if(valor==b2){
-       peso= peso.concat('2');
-    }
-    else if(valor==b3){
-       peso= peso.concat('3');
-    }
-    else if(valor==b4){
-       peso= peso.concat('4');
-    }
-    else if(valor==b5){
-       peso= peso.concat('5');
-    }
-    else if(valor==b6){
-       peso= peso.concat('6');
-    }
-    else if(valor==b7){
-      peso=  peso.concat('7');
-    }
-    else if(valor==b8){
-       peso= peso.concat('8');
-    }else if(valor==b9){
-       peso= peso.concat('9');
-    }
    atualizarLog("Peso acumulado: "+peso);
 }
-
+//Adiciona pontos na tela
 function onTapHandler(pointer, doubleTap) {
 
-    if (!over)
+    if (!overTap)
     {
         var img = game.add.sprite(game.input.activePointer.position.x, game.input.activePointer.position.y, 'centroid', 0);        
         img.anchor.set(0.5);
@@ -303,7 +249,6 @@ function exibirLinhas(){
         for(var i =0;i<setLP.length;i++){
             setLP[i][0].fromSprite(setLP[i][1][0],setLP[i][1][1]);
         }
-       
     }
 }
 
@@ -318,21 +263,39 @@ function connectLine() {
              
         }else{
 			//TODO::DÁ PRA TRANSFORMAR ISSO AQUI NUMA ESTRUTURA MELHOR
-			
-            aux.push(adjPesos[0]);
-            aux.push(adjPesos[1]);
-            
-            aux.push(peso);
-			enlace = create_enlace();
-			enlace.criar(adjPesos[0],adjPesos[1],peso);
-            enlaces.push(enlace);
-            auxAdj.push(aux);
+			var aux = {
+				u:0,
+				v:0,
+				peso:0,
+				ocupado:0,
+				linha:[],
+				parPoints:[],
+			}
+			aux.u = adjPesos[0];
+			aux.v = adjPesos[1];
+
+            //aux.push(adjPesos[0]);//adjPesos é um vetor[2] que guarda o id do ponto escolhido
+            //aux.push(adjPesos[1]);
+            var selection ;
+            do{
+    			selection = parseInt(prompt("Please enter a number from 1 to 100", "peso"), 10);
+			}while(isNaN(selection) || selection > 100 || selection < 1);
+			peso = selection;
+            //aux.push(peso);
+            aux.peso = peso;
+
+			//enlace = create_enlace();
+			//enlace.criar(adjPesos[0],adjPesos[1],peso);
+            //enlaces.push(enlace);
+            auxAdj.push(aux);//guarda as arestas  com infor de origem,destino e peso
             /*console.log(aux);
 			console.log(auxAdj);
 			console.log(parPoints);*/
             aux =[];
             makeLine=true;
             line = new Phaser.Line(parPoints[0].x,parPoints[0].y,parPoints[1].x,parPoints[1].y);
+            console.log("teste line");
+            console.log(line);
             aux.push(line);
             aux.push(parPoints);
             //aux.push(parseInt(peso));
@@ -372,10 +335,9 @@ function menorCaminho_init(origem,destino){
 	menorCaminho_loop(u,destino,dist,conj,visitados,adj);
     console.log(dist);
 	console.log(saida);
-	console.log(enlaces);
+	//console.log(enlaces);
 	str_saida= "distancia: "+JSON.stringify(dist)
-	+"saida: "+ JSON.stringify(dist)+
-	"Enlaces: "+ JSON.stringify(enlaces);
+	+"saida: "+ JSON.stringify(saida);
 	atualizarLog(str_saida);
 }
 
@@ -409,6 +371,8 @@ function menorCaminho_loop(u,fim,dist,conj,visitados,adj){
 		}
 	}
 }
+
+
 
 function create_enlace(){
 	var enlace = {
