@@ -30,7 +30,6 @@ var oito;
 var nove;
 var zero;
 var connection = 0;
-var lines = [];
 var grafo = [];
 var linha = [];
 var makeLine = false;
@@ -57,7 +56,7 @@ var avaliar = false;
 var calculo_final= false;
 var enlaces=[]
 var etapa = {
-	fase: 0, em_execucao:0
+	fase: 1, em_execucao:0
 }
 
 //Configuração de teclas de entrada de dados
@@ -111,72 +110,79 @@ function create() {
 	currentPoint = game.add.image(10, 10, 'centroid');
 	currentPoint.anchor.set(0.5);
 	currentPoint.alpha = 0.9;
+	currentPoint.transparent = true;
 	game.input.onTap.add(onTapHandler, this);
 }
 
 function update() {
     
-    if(spaceKey.isDown){
-        
-        over=true;
-        currentPoint.visible=false;
-        currentPoint.inputEnabled=false;
-        etapa.fase=2;
-		etapa.em_execucao = 0;
-    }else if(!over){
-        currentPoint.position.copyFrom(game.input.activePointer.position);
-    }else if(enterKey.isDown){
-        lineOn=true;
-        etapa.em_execucao = 1;
-    }else if(lineOn){
-        if(enterStop.isDown){
-            etapa.em_execucao = 0;
+    switch ( etapa.fase ){
+    	case 1:
+    	if(!spaceKey.isDown){
+    		currentPoint.position.copyFrom(game.input.activePointer.position);
+		}
+		else{
+			currentPoint.visible=false;
+	        currentPoint.inputEnabled=false;
+	        etapa.fase=2;
+			etapa.em_execucao = 0;	
+		}
+		break;
+		case 2:
+		  if ( etapa.em_execucao == 1  && enterStop.isDown){
+		  	etapa.em_execucao = 0;
 			etapa.fase = 3;
-            flag=true;
-            lineOn=false;
+			flag=true;
             var inf= Number.MAX_SAFE_INTEGER;
-           
             for(var i=0;i<points.length;i++){
                 linha=[];
                 grafo.push(linha);
                 for(var j=0;j<points.length;j++){
-					grafo[i].push(-1);//se tem ou nao ligação
+                grafo[i].push(-1);//se tem ou nao ligação
                 }
             }
             
             for(var k=0;k<auxAdj.length;k++){
                 for(var i=0;i<points.length;i++){
-                    if((auxAdj[k][0]-1)==i){
+                    if( (auxAdj[k][0]-1) == i){
                         grafo[i][(auxAdj[k][1]-1)] =parseInt(auxAdj[k][2]);
-                         grafo[(auxAdj[k][1]-1)][i] =parseInt(auxAdj[k][2]);
+                        grafo[(auxAdj[k][1]-1)][i] =parseInt(auxAdj[k][2]);
                     }
-                   
                 }
             }
 			calculo_final = true;
 			show=1;
-			//alert("Agora informe a origem pelo teclado virtual ao lado, em seguinda aperte O. ");
-        }else{
-            connectLine();
-        } 
-    }else if(calculo_final){
-        
-		var vertices= points.length;
-        if(enterOri.isDown){
+		  }
+		  if (enterKey.isDown){
+        	etapa.em_execucao = 1;
+		  }
+
+		  if ( etapa.em_execucao ){
+		  	connectLine();
+		  }
+
+		  break;
+		case 5:
+		etapa.fase = 6;
+		menorCaminho_init(parseInt(ori),parseInt(dest));
+		calculo_final= false;
+		break;
+		default:
+		console.log("saindo da faixa de fase");
+	}
+    
+    if(calculo_final){
+    	if(enterOri.isDown){
 			enterOri.isDown=false;
-			var int_ori = parseInt(ori);
 			if(peso==""&& ori==""){
 				alert("desculpe! você não informou a origem ainda? tente novamente por favor.");
 			}
-			else if( parseInt(peso)> vertices ){
-				alert("desculpe! nosso grafo só vai até o nó ("+vertices+") e vc informou: "+peso);
-				peso="";
-			}
-			else{
+			
+			if ( validaVetice() ){
 				ori = peso; 
 				etapa.fase = 4;
-				show =1;
 				etapa.em_execucao =0;
+				show =1;
 				peso = '';	
 			}
         }
@@ -184,30 +190,17 @@ function update() {
             if(peso==""&& dest==""){
 				alert("desculpe! você não informou o destino ainda? tente novamente por favor.");
 			}
-			else if( parseInt(peso)> vertices ){
-				alert("desculpe! nosso grafo só vai até o nó ("+vertices+") e vc informou"+peso);
-				peso="";
-			}
-			else{
+		
+			if ( validaVetice() ){
 				dest = peso; 
 				etapa.fase = 5;
+				etapa.em_execucao =0;
+				show =1;
 				peso = '';	
 			}
         }
-		if( ori != "" && dest !=""){
-			menorCaminho_init(parseInt(ori),parseInt(dest));
-			calculo_final= false;
-		}
     }
-    
-    
-    if(makeLine){
-        for(var i =0;i<setLP.length;i++){
-            setLP[i][0].fromSprite(setLP[i][1][0],setLP[i][1][1]);
-        }
-       //  lines[0].fromSprite(parPoints[0],parPoints[1]);
-    }
-    
+    exibirLinhas();
 }
 
 function render(){
@@ -305,12 +298,22 @@ function onTapHandler(pointer, doubleTap) {
     }
 }
 
+function exibirLinhas(){
+	if(makeLine){
+        for(var i =0;i<setLP.length;i++){
+            setLP[i][0].fromSprite(setLP[i][1][0],setLP[i][1][1]);
+        }
+       
+    }
+}
+
+
 function connectLine() {
    
     for(var i=0;i<points.length;i++){
        
         if(this.connection<2){
-            
+            console.log("ele esta tentando conectar linhas");
              points[i].events.onInputDown.add(getPoints, this,points[i]);
              
         }else{
@@ -318,6 +321,7 @@ function connectLine() {
 			
             aux.push(adjPesos[0]);
             aux.push(adjPesos[1]);
+            
             aux.push(peso);
 			enlace = create_enlace();
 			enlace.criar(adjPesos[0],adjPesos[1],peso);
