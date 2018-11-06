@@ -23,7 +23,7 @@ class Ponto {
 }
 var p = new Retangulo();
 console.log(p);
-console.log(gerarChamadas(10));
+console.log(gerarChamadas(100));
 
 //================== teste acima		
 var game = new Phaser.Game(800, 400, Phaser.CANVAS, 'phaser-id',
@@ -470,8 +470,8 @@ function gerarChamadas(quantidade){
 		chamada = {
 			par:""+u+"-"+v,
 			solicitacao:0,//quantidade de recorrencua
-			caminhos=[
-			{/*rota:'1-2',distancia:120(int)*/}] ,
+			caminhos:[
+			/*{rota:'1-2',distancia:120(int)}*/] ,
 			prob_erro: function(){
 				return caminhos.length/solicitacao;
 			}
