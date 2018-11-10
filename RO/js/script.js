@@ -113,23 +113,10 @@ function update() {
 		  	etapa.em_execucao = 0;
 			etapa.fase = 3;
 			flag=true;
-            var inf= Number.MAX_SAFE_INTEGER;
-            for(var i=0;i<points.length;i++){
-                linha=[];
-                grafo.push(linha);
-                for(var j=0;j<points.length;j++){
-                grafo[i].push(-1);//se tem ou nao ligação
-                }
-            }
-            
-            for(var k=0;k<auxAdj.length;k++){
-                for(var i=0;i<points.length;i++){
-                    if( (auxAdj[k].u-1) == i){
-                        grafo[i][(auxAdj[k].v-1)] =parseInt(auxAdj[k].peso);
-                        grafo[(auxAdj[k].v-1)][i] =parseInt(auxAdj[k].peso);
-                    }
-                }
-            }
+			criarGrafo();
+			//game.paused = true;
+			salvarEstagio();
+			
 			calculo_final = true;
 			show=1;
 		  }
@@ -244,14 +231,20 @@ function actionOnClick (valor) {
 function onTapHandler(pointer, doubleTap) {
     if (!overTap)
     {
-        var img = game.add.sprite(game.input.activePointer.position.x, game.input.activePointer.position.y, 'centroid', 0);        
+        
+        img = createImg(game.input.activePointer.position.x, game.input.activePointer.position.y,points.length+1);
+        points.push(img);
+    }
+}
+function createImg(x,y, id){
+	var img = game.add.sprite(x, y, 'centroid', 0);        
         img.anchor.set(0.5);
         img.alpha = 0.7;
         img.inputEnabled = true;
         img.input.enableDrag(true);
         img.defaultCursor = "move";
-        points.push(img);
-    }
+        img.indice = id;
+     return img;
 }
 
 function exibirLinhas(){
@@ -278,6 +271,13 @@ function connectLine() {
 				ocupado:0,
 				linha:{},
 				parPoints:[],
+				getjson:function(){
+					var saveObject = {};
+					saveObject.u = this.u;
+					saveObject.v = this.v;
+					saveObject.peso = this.peso;
+					return JSON.stringify(saveObject);
+				}
 			}
 			aux.u = adjPesos[0];
 			aux.v = adjPesos[1];
@@ -294,8 +294,6 @@ function connectLine() {
             aux =[];
             makeLine=true;
             line = new Phaser.Line(parPoints[0].x,parPoints[0].y,parPoints[1].x,parPoints[1].y);
-            console.log("teste line");
-            console.log(line);
 			var aux = {
 				u:0,
 				v:0,
@@ -328,6 +326,58 @@ function connectLine() {
 /*
 CALCULO DE DISTANCIA
 */
+function salvarEstagio(){
+	save = {"grafo":{
+	points: points.map(function (point){
+			var saveObject = {};
+			saveObject.x = point.x;
+			saveObject.y = point.y;
+			saveObject.indice = point.indice;
+			return JSON.stringify(saveObject);
+		}),
+		auxAdj:auxAdj.map(function(adj){
+			return adj.getjson();
+		})
+	}};
+    salvar(JSON.stringify(save));
+}
+function salvar(obj) {
+		let titulo = "graph";
+
+		var data = new Date();
+
+		var dia     = data.getDate();            
+		var mes     = data.getMonth();          
+		var ano4    = data.getFullYear(); 
+
+
+		var str_data = ano4 + '-' + (mes+1) + '-' + dia;
+
+		titulo+= str_data;
+
+		var blob = new Blob([obj], { type: "text/plain;charset=utf-8" });
+		saveAs(blob, titulo + ".txt");
+}
+function criarGrafo(){
+	var inf= Number.MAX_SAFE_INTEGER;
+    for(var i=0;i<points.length;i++){
+        linha=[];
+        grafo.push(linha);
+        for(var j=0;j<points.length;j++){
+        grafo[i].push(-1);//se tem ou nao ligação
+        }
+    }
+    
+    for(var k=0;k<auxAdj.length;k++){
+        for(var i=0;i<points.length;i++){
+            if( (auxAdj[k].u-1) == i){
+                grafo[i][(auxAdj[k].v-1)] =parseInt(auxAdj[k].peso);
+                grafo[(auxAdj[k].v-1)][i] =parseInt(auxAdj[k].peso);
+            }
+        }
+    }
+}
+
 var caminho=[];
 var saida=[];
 function menorCaminho_init(origem,destino){
@@ -434,13 +484,6 @@ function create_enlace(){
 	return enlace;
 }
 
-function getPoints (point) {
-  
-   adjPesos.push(points.indexOf(point)+1);
-  
-   this.connection+=1;
-   parPoints.push(point);
-}
 function gerarChamadas(quantidade){
 	var points= [0,0,0,0];
     chamadas ={
@@ -479,6 +522,15 @@ function gerarChamadas(quantidade){
 	}
 	return chamadas;
 }
+
+function getPoints (point) {
+  
+   adjPesos.push(points.indexOf(point)+1);
+  
+   this.connection+=1;
+   parPoints.push(point);
+}
+
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
