@@ -1,11 +1,37 @@
-﻿var game = new Phaser.Game(800, 400, Phaser.CANVAS, 'phaser-id',
+﻿class Retangulo {
+  constructor(altura, largura) {
+    this.altura = altura;
+    this.largura = largura;
+  }	
+  calculaArea() {  
+        return this.altura * this.largura;  
+    }	
+}
+class Ponto {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    static distancia(a, b) {
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+
+        return Math.sqrt(dx*dx + dy*dy);
+    }
+}
+var p = new Retangulo();
+console.log(p);
+console.log(gerarChamadas(100));
+
+//================== teste acima		
+var game = new Phaser.Game(800, 400, Phaser.CANVAS, 'phaser-id',
  { preload: preload, create: create, update: update, render:render});
 
 function preload() {
     game.load.spritesheet('centroid', 'img/balls.png', 17, 17);
     game.load.spritesheet('button', 'img/button.png', 80, 20);
 }
-
 var points = [];
 var parPoints = [];
 var adjPesos = [];
@@ -65,14 +91,8 @@ function create() {
 	currentPoint.anchor.set(0.5);
 	currentPoint.alpha = 0.9;
 	game.input.onTap.add(onTapHandler, this);
-	salvar();
 }
- function salvar() {
-            
-            let titulo = "teste"
-            var blob = new Blob([currentPoint.anchor], { type: "text/plain;charset=utf-8" });
-            saveAs(blob, titulo + ".txt");
-        }
+
 function update() {
     
     switch ( etapa.fase ){
@@ -80,7 +100,7 @@ function update() {
     	if(!spaceKey.isDown){
     		currentPoint.position.copyFrom(game.input.activePointer.position);
 		}
-		else{
+		else{			
 			currentPoint.visible=false;
 	        currentPoint.inputEnabled=false;
 	        etapa.fase=2;
@@ -133,7 +153,6 @@ function update() {
     
     if(calculo_final){
     	if(enterOri.isDown){
-			//enterOri.isDown=false;
 			var selection ;
             do{
     			selection = parseInt(prompt("Please enter a number from 1 to " + points.length, "peso"), 10);
@@ -143,17 +162,6 @@ function update() {
 			etapa.fase = 4;
 			etapa.em_execucao =0;
 			show =1;
-			/*if(peso==""&& ori==""){
-				alert("desculpe! você não informou a origem ainda? tente novamente por favor.");
-			}
-			
-			if ( validaVetice() ){
-				ori = peso; 
-				etapa.fase = 4;
-				etapa.em_execucao =0;
-				show =1;
-				peso = '';	
-			}*/
         }
         if(enterDest.isDown){
 
@@ -167,19 +175,6 @@ function update() {
 			etapa.em_execucao =0;
 			show =1;
 			peso = '';	
-            
-            /*if(peso==""&& dest==""){
-				alert("desculpe! você não informou o destino ainda? tente novamente por favor.");
-			}
-		
-			if ( validaVetice() ){
-				dest = peso; 
-				etapa.fase = 5;
-				etapa.em_execucao =0;
-				show =1;
-				peso = '';	
-			}
-			*/
         }
     }
     exibirLinhas();
@@ -193,11 +188,21 @@ function render(){
     });
     //setar um texto exatamento no meio da distancia entre os pontos
     for(var i=0;i<setLP.length;i++){
-         game.debug.text(auxAdj[i].peso, (setLP[i][1][0].x+setLP[i][1][1].x)/2,(setLP[i][1][0].y+setLP[i][1][1].y)/2, "white", "20px Courier");
+		 var mx = ( setLP[i].parPoints.p1.x + setLP[i].parPoints.p2.x )/2;
+		 var my = ( setLP[i].parPoints.p1.y + setLP[i].parPoints.p2.y )/2;
+         game.debug.text( auxAdj[i].peso, mx,my, "white", "20px Courier" );
     }
     for(var i =0;i<setLP.length;i++){
-         game.debug.geom(setLP[i][0]);
+         game.debug.geom(setLP[i].linha);
     }      
+	/*console.log("render"+etapa);
+	if( connection==1	){
+		console.log("entriu aqui render");	
+		line = new Phaser.Line(parPoints[0].x,parPoints[0].y,currentPoint.x,currentPoint.y);
+		console.log("entriu aqui render");
+		console.log(line);
+		game.debug.geom(line);		 
+	}*/
 }
 
 // FUNÇÕES DE APOIO DO PROJETO
@@ -237,7 +242,6 @@ function actionOnClick (valor) {
 }
 //Adiciona pontos na tela
 function onTapHandler(pointer, doubleTap) {
-
     if (!overTap)
     {
         var img = game.add.sprite(game.input.activePointer.position.x, game.input.activePointer.position.y, 'centroid', 0);        
@@ -253,11 +257,10 @@ function onTapHandler(pointer, doubleTap) {
 function exibirLinhas(){
 	if(makeLine){
         for(var i =0;i<setLP.length;i++){
-            setLP[i][0].fromSprite(setLP[i][1][0],setLP[i][1][1]);
+            setLP[i].linha.fromSprite( setLP[i].parPoints.p1, setLP[i].parPoints.p2 );
         }
     }
 }
-
 
 function connectLine() {
    
@@ -266,7 +269,6 @@ function connectLine() {
         if(this.connection<2){
             console.log("ele esta tentando conectar linhas");
              points[i].events.onInputDown.add(getPoints, this,points[i]);
-             
         }else{
 			//TODO::DÁ PRA TRANSFORMAR ISSO AQUI NUMA ESTRUTURA MELHOR
 			var aux = {
@@ -274,7 +276,7 @@ function connectLine() {
 				v:0,
 				peso:0,
 				ocupado:0,
-				linha:[],
+				linha:{},
 				parPoints:[],
 			}
 			aux.u = adjPesos[0];
@@ -287,25 +289,32 @@ function connectLine() {
     			selection = parseInt(prompt("Please enter a number from 1 to 100", "peso"), 10);
 			}while(isNaN(selection) || selection > 100 || selection < 1);
 			peso = selection;
-            //aux.push(peso);
             aux.peso = peso;
-
-			//enlace = create_enlace();
-			//enlace.criar(adjPesos[0],adjPesos[1],peso);
-            //enlaces.push(enlace);
-            auxAdj.push(aux);//guarda as arestas  com infor de origem,destino e peso
-            /*console.log(aux);
-			console.log(auxAdj);
-			console.log(parPoints);*/
+            auxAdj.push(aux);//guarda as arestas  com infor de origem,destino e peso            
             aux =[];
             makeLine=true;
             line = new Phaser.Line(parPoints[0].x,parPoints[0].y,parPoints[1].x,parPoints[1].y);
             console.log("teste line");
             console.log(line);
-            aux.push(line);
-            aux.push(parPoints);
-            //aux.push(parseInt(peso));
+			var aux = {
+				u:0,
+				v:0,
+				peso:0,
+				ocupado:0,
+				linha:{},
+				parPoints:{
+						p1:{},p2:{}
+				}
+			}
+			aux.linha = line;
+            //aux.push(line);
+			aux.parPoints.p1 = parPoints[0];
+			aux.parPoints.p2 = parPoints[1];
+            aux.peso = peso;
             setLP.push(aux);
+			
+			//setLP[i] eh um vetor de duas pocisoes = [ linha, parpoint[]  ]
+			//parPoints é um vetor de duas pocisoes = [ ponto1,ponto2 ]
             
             this.connection=0;
             parPoints=[];
@@ -431,4 +440,48 @@ function getPoints (point) {
   
    this.connection+=1;
    parPoints.push(point);
+}
+function gerarChamadas(quantidade){
+	var points= [0,0,0,0];
+    chamadas ={
+    	quantidade: quantidade,
+    	buscas : [],
+    	verificacoes : [/*{ rota:"1-2",caminho:'1-2', ditancia:120(int)}*/],
+    	alocar_chamada : function(u,v){
+    		var disponivel= true;
+    		for (var i=0; i< this.buscas.length && disponivel;i++){
+    			if( this.buscas[i].par == ""+u+"-"+v  || this.buscas[i].par == ""+v+"-"+u){
+    				disponivel= false;
+    			}
+    		}
+    		return disponivel;
+    	}
+    };
+	for(var i=1;i<=quantidade;i++ ){
+		var u = getRandomInt(1, points.length);
+		var v = getRandomInt(1, points.length);
+		while (u==v){
+			var v = getRandomInt(1, points.length);
+		}
+		if (u>v){
+			t =u; u=v; v=t;
+		}
+		chamada = {
+			par:""+u+"-"+v,
+			solicitacao:0,//quantidade de recorrencua
+			caminhos:[
+			/*{rota:'1-2',distancia:120(int)}*/] ,
+			prob_erro: function(){
+				return caminhos.length/solicitacao;
+			}
+		}
+		chamadas.buscas.push(chamada);
+	}
+	return chamadas;
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
 }
