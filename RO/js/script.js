@@ -65,8 +65,14 @@ function create() {
 	currentPoint.anchor.set(0.5);
 	currentPoint.alpha = 0.9;
 	game.input.onTap.add(onTapHandler, this);
+	salvar();
 }
-
+ function salvar() {
+            
+            let titulo = "teste"
+            var blob = new Blob([currentPoint.anchor], { type: "text/plain;charset=utf-8" });
+            saveAs(blob, titulo + ".txt");
+        }
 function update() {
     
     switch ( etapa.fase ){
