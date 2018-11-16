@@ -18,13 +18,13 @@
 	        }
     	}
 	}
-	setMatrizAdj(auxAdj){
-		for( let k=0; k < auxAdj.length; k++ ){
+	setMatrizAdj(dataLinhasPontos){
+		for( let k=0; k < dataLinhasPontos.length; k++ ){
 	        for( let i=0; i< this.lengthVertices; i++ ){
-	            if( (auxAdj[k].u-1) == i){
-	            	let v = auxAdj[k].v-1;
-	                this.matrizADJ[i][ v ] =parseInt(auxAdj[k].peso);
-	                this.matrizADJ[ v ][i] =parseInt(auxAdj[k].peso);
+	            if( (dataLinhasPontos[k].u-1) == i){
+	            	let v = dataLinhasPontos[k].v-1;
+	                this.matrizADJ[i][ v ] =parseInt(dataLinhasPontos[k].peso);
+	                this.matrizADJ[ v ][i] =parseInt(dataLinhasPontos[k].peso);
 	            }
 	        }
     	}
@@ -121,10 +121,8 @@ function preload() {
 }
 //grafo
 var points = [];
-var parPoints = [];
 var adjPesos = [];
-var auxAdj=[];
-var setLP = [];
+var dataLinhasPontos=[];
 var peso='';
 //phaser
 var overTap = false;
@@ -139,7 +137,7 @@ var flag=false;
 //projeto
 var show=1;
 var etapa = {
-	fase: 1, em_execucao:0
+	fase: 0, em_execucao:0
 }
 
 //Configuração de teclas de entrada de dados
@@ -168,9 +166,19 @@ function create() {
 	game.input.onTap.add(onTapHandler, this);
 }
 
+function getStart(){
+	etapa.fase=1;
+	overTap= false;
+	game.paused = false;
+}
+
 function update() {
     
     switch ( etapa.fase ){
+    	case 0:
+    		overTap= true;
+    		game.paused = true;
+    		break;
     	case 1:
     	if(!spaceKey.isDown){
     		currentPoint.position.copyFrom(game.input.activePointer.position);
@@ -208,28 +216,38 @@ function update() {
 			etapa.fase = 4;
 			break;
 		default:
-		console.log("saindo da faixa de fase");
+		//console.log("saindo da faixa de fase");
 	}
-    
-    
-    exibirLinhas();
 }
 
 function render(){
+	//adiciona indicie a bolinha
     var index=1;
     points.forEach(function(child) {
         game.debug.text(index, child.x - 10,child.y + 25, style_verticetxt.color,style_verticetxt.font);
         index+=1;
     });
-    //setar um texto exatamento no meio da distancia entre os pontos
-    for(var i=0;i<setLP.length;i++){
-		 var mx = ( setLP[i].parPoints.p1.x + setLP[i].parPoints.p2.x )/2;
-		 var my = ( setLP[i].parPoints.p1.y + setLP[i].parPoints.p2.y )/2;
-         game.debug.text( auxAdj[i].peso, mx,my, "white", "20px Courier" );
+    exibirLinhas();
+}
+
+function exibirLinhas(){
+	if(makeLine){
+
+        //setar um peso exatamento no meio da distancia entre os pontos
+	    for(var i=0;i< dataLinhasPontos.length;i++){
+	    	var p1Point  = getPoint(dataLinhasPontos[i].u);
+	    	var p2Point  = getPoint(dataLinhasPontos[i].v);
+			//atualiza linha
+	    	dataLinhasPontos[i].linha.fromSprite( p1Point, p2Point );
+	    	//adiciona linha no game
+	    	game.debug.geom(dataLinhasPontos[i].linha);
+
+			var mx = ( p1Point.x + p2Point.x )/2;
+			var my = ( p1Point.y + p2Point.y )/2;
+	        game.debug.text( dataLinhasPontos[i].peso, mx,my, "white", "20px Courier" );
+	    }
+
     }
-    for(var i =0;i<setLP.length;i++){
-         game.debug.geom(setLP[i].linha);
-    }     
 }
 
 // FUNÇÕES DE APOIO DO PROJETO
@@ -250,12 +268,7 @@ function projeto(){
 			"\nDiga o valor do peso e clique nos dois vertices que deseja criar a aresta."+
 			"\n\nPara encerrar,aperte a tecla \"s\".");
 		}
-		else {
-			alert("Analise o LOG de saída.");
-		}
-		
 	}
-	
 }
 
 // FUNÇÕES CHAVE DE EXECUÇÃO DO PROJETO
@@ -269,7 +282,6 @@ function actionOnClick (valor) {
 function onTapHandler(pointer, doubleTap) {
     if (!overTap)
     {
-        
         img = createImg(game.input.activePointer.position.x, game.input.activePointer.position.y,points.length+1);
         points.push(img);
     }
@@ -285,12 +297,34 @@ function createImg(x,y, id){
      return img;
 }
 
-function exibirLinhas(){
-	if(makeLine){
-        for(var i =0;i<setLP.length;i++){
-            setLP[i].linha.fromSprite( setLP[i].parPoints.p1, setLP[i].parPoints.p2 );
-        }
-    }
+function inicarParPoint(){
+	var aux = {
+				u:0,
+				v:0,
+				peso:0,
+				ocupado:0,
+				linha:{},
+				getjson:function(){
+					var saveObject = {};
+					saveObject.u = this.u;
+					saveObject.v = this.v;
+					saveObject.peso = this.peso;
+					return JSON.stringify(saveObject);
+				}
+			};
+	return  aux;
+}
+
+function configParPoint(idP1,idP2, peso){
+	var aux = inicarParPoint();
+	aux.u = idP1;
+	aux.v = idP2;
+    var p1Point  = getPoint(idP1);
+    var p2Point  = getPoint(idP2);
+	line = new Phaser.Line( p1Point.x, p1Point.y, p2Point.x, p2Point.y);
+	aux.peso = peso;
+	aux.linha = line;
+	return aux;
 }
 
 function connectLine() {
@@ -302,24 +336,6 @@ function connectLine() {
             points[i].events.onInputDown.add(getPoints, this,points[i]);
         }else{
 			//TODO::DÁ PRA TRANSFORMAR ISSO AQUI NUMA ESTRUTURA MELHOR
-			var aux = {
-				u:0,
-				v:0,
-				peso:0,
-				ocupado:0,
-				linha:{},
-				parPoints:[],
-				getjson:function(){
-					var saveObject = {};
-					saveObject.u = this.u;
-					saveObject.v = this.v;
-					saveObject.peso = this.peso;
-					return JSON.stringify(saveObject);
-				}
-			}
-			aux.u = adjPesos[0];
-			aux.v = adjPesos[1];
-
             //aux.push(adjPesos[0]);//adjPesos é um vetor[2] que guarda o id do ponto escolhido
             //aux.push(adjPesos[1]);
             var selection ;
@@ -327,39 +343,19 @@ function connectLine() {
     			selection = parseInt(prompt("Please enter a number from 1 to 100", "peso"), 10);
 			}while(isNaN(selection) || selection > 100 || selection < 1);
 			peso = selection;
-            aux.peso = peso;
-            auxAdj.push(aux);//guarda as arestas  com infor de origem,destino e peso            
-            aux =[];
-            makeLine=true;
-            line = new Phaser.Line(parPoints[0].x,parPoints[0].y,parPoints[1].x,parPoints[1].y);
-			var aux = {
-				u:0,
-				v:0,
-				peso:0,
-				ocupado:0,
-				linha:{},
-				parPoints:{
-						p1:{},p2:{}
-				}
-			}
-			aux.linha = line;
-            //aux.push(line);
-			aux.parPoints.p1 = parPoints[0];
-			aux.parPoints.p2 = parPoints[1];
-            aux.peso = peso;
-            setLP.push(aux);
-			
-			//setLP[i] eh um vetor de duas pocisoes = [ linha, parpoint[]  ]
-			//parPoints é um vetor de duas pocisoes = [ ponto1,ponto2 ]
             
-            this.connection=0;
-            parPoints=[];
-            aux=[];
-            adjPesos = [];
-            peso = '';
-			atualizarLog("Peso acumulado: "+peso);
+            aux = configParPoint(adjPesos[0],adjPesos[1],peso);
+            dataLinhasPontos.push(aux);//guarda as arestas  com infor de origem,destino e peso            
+            makeLine=true;
+			resetFindParPoint();
         }
     }
+}
+
+function resetFindParPoint(){
+		this.connection=0;
+		adjPesos = [];
+		peso = '';
 }
 /*
 CALCULO DE DISTANCIA
@@ -373,7 +369,7 @@ function salvarEstagio(){
 			saveObject.indice = point.indice;
 			return JSON.stringify(saveObject);
 		}),
-		auxAdj:auxAdj.map(function(adj){
+		dataLinhasPontos:dataLinhasPontos.map(function(adj){
 			return adj.getjson();
 		})
 	}};
@@ -397,13 +393,15 @@ function salvar(obj) {
 }
 
 
+function getPoint(id){
+	return points[id-1];
+}
 
 function getPoints (point) {
   
    adjPesos.push(points.indexOf(point)+1);
   
    this.connection+=1;
-   parPoints.push(point);
 }
 
 
@@ -411,6 +409,21 @@ function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min)) + min;
+}
+
+
+class RedesOticas{
+	constructor(points, rotas){
+		this.points = points;
+		this.rotas = rotas;
+	}
+
+}
+
+class MapaProjeto{
+	constructor(altura, largura){
+
+	}
 }
 
 function gerarChamadas(quantidade, totalPontos){
@@ -474,7 +487,7 @@ function gerarChamadas(quantidade, totalPontos){
 	
 function criarGrafo(ahan){
 	grafo = new Grafo(points.length);
-	grafo.setMatrizAdj(auxAdj);
+	grafo.setMatrizAdj(dataLinhasPontos);
 	graphAlgoritms= new GraphAlgoritms( grafo );
 
 	calls = gerarChamadas(ahan, points.length);
