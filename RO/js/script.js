@@ -168,15 +168,21 @@ function create() {
 
 function getStart(){
 	etapa.fase=1;
-	overTap= false;
+	setInputTap(true);
 	game.paused = false;
+}
+
+function setInputTap(pode){
+	currentPoint.visible= go;
+	currentPoint.inputEnabled = go;
+	overTap= !pode;
 }
 
 function update() {
     
     switch ( etapa.fase ){
     	case 0:
-    		overTap= true;
+    		setInputTap(false);
     		game.paused = true;
     		break;
     	case 1:
@@ -184,11 +190,10 @@ function update() {
     		currentPoint.position.copyFrom(game.input.activePointer.position);
 		}
 		else{			
-			currentPoint.visible=false;
-	        currentPoint.inputEnabled=false;
+			setInputTap(false);
 	        etapa.fase=2;
 			etapa.em_execucao = 0;	
-			overTap= true;
+			
 		}
 		break;
 		case 2:
@@ -219,6 +224,15 @@ function update() {
 		//console.log("saindo da faixa de fase");
 	}
 }
+function setDataLinhasPontos(){
+	
+	// jogo pausado?
+	setInputTap(false);
+	etapa.fase = 3;
+	//configurar vector points
+	//configurar dataLinhasPontos;
+}
+
 
 function render(){
 	//adiciona indicie a bolinha
