@@ -112,39 +112,32 @@ class GraphAlgoritms{
 
 
 //================== teste acima		
-var game = new Phaser.Game(800, 400, Phaser.CANVAS, 'phaser-id',
+var game = new Phaser.Game(600, 400, Phaser.CANVAS, 'phaser-id',
  { preload: preload, create: create, update: update, render:render});
 
 function preload() {
     game.load.spritesheet('centroid', 'img/balls.png', 17, 17);
     game.load.spritesheet('button', 'img/button.png', 80, 20);
 }
+//grafo
 var points = [];
 var parPoints = [];
 var adjPesos = [];
 var auxAdj=[];
-var aux = [];
 var setLP = [];
+var peso='';
+//phaser
 var overTap = false;
 var currentPoint;
 var centroid;
-var inputType;
-var lineOn=false;
 var enterKey;
 var connection = 0;
 var makeLine = false;
-var peso='';
 var enterStop;
-var flag=false;
-var enterOri;
-var enterDest;
-var ori='';
-var dest='';
 var style;
+var flag=false;
+//projeto
 var show=1;
-var avaliar = false;
-var calculo_final= false;
-var enlaces=[]
 var etapa = {
 	fase: 1, em_execucao:0
 }
@@ -152,8 +145,6 @@ var etapa = {
 //Configuração de teclas de entrada de dados
 function config_buttons(){
 	//config teclas
-	enterOri = game.input.keyboard.addKey(Phaser.Keyboard.O);
-	enterDest = game.input.keyboard.addKey(Phaser.Keyboard.D);
 	enterStop = game.input.keyboard.addKey(Phaser.Keyboard.S);
 	spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 	enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
@@ -210,11 +201,9 @@ function update() {
 		  break;
 		case 3:
 			var selection ;
-
             do{
     			selection = parseInt(prompt("Please enter a number from 1 to 1000", "Chamadas"), 10);
 			}while(isNaN(selection) || selection > 1000 || selection < 1);
-			
 			criarGrafo(selection);
 			etapa.fase = 4;
 			break;
@@ -240,15 +229,7 @@ function render(){
     }
     for(var i =0;i<setLP.length;i++){
          game.debug.geom(setLP[i].linha);
-    }      
-	/*console.log("render"+etapa);
-	if( connection==1	){
-		console.log("entriu aqui render");	
-		line = new Phaser.Line(parPoints[0].x,parPoints[0].y,currentPoint.x,currentPoint.y);
-		console.log("entriu aqui render");
-		console.log(line);
-		game.debug.geom(line);		 
-	}*/
+    }     
 }
 
 // FUNÇÕES DE APOIO DO PROJETO
@@ -260,16 +241,14 @@ function ajuda(){
 function projeto(){
 	if(show ==1){
 		show++;
-		if (etapa.fase < 3){
-			alert("Coloque os pontos clicando.\n"+
-		"Para encerrar a inserção de pontos aperte a tecla \"space\"."+
-"\n\nPara começar a inserir as arestas aperte a tecla \"enter\" :"+
-"\nDiga o valor do peso e clique nos dois vertices que deseja criar a aresta."+
-"\n\nPara encerrar,aperte a tecla \"s\".");
-		}else if (etapa.fase == 3){
-			alert("Quando estiver pronto, aperte O e informe o ponto de origem.");
-		}else if(etapa.fase == 4){
-			alert("Quando estiver pronto, aperte D e informe o ponto de destino.");
+		if(etapa.fase ==1){
+			alert("Coloque os pontos clicando."+"\n"+"Para encerrar a inserção de pontos aperte a tecla \"space\".");
+		}
+		if(etapa.fase ==2){
+			
+			alert("\n\nPara começar a inserir as arestas aperte a tecla \"enter\" :"+
+			"\nDiga o valor do peso e clique nos dois vertices que deseja criar a aresta."+
+			"\n\nPara encerrar,aperte a tecla \"s\".");
 		}
 		else {
 			alert("Analise o LOG de saída.");
@@ -408,7 +387,6 @@ function salvar(obj) {
 		var dia     = data.getDate();            
 		var mes     = data.getMonth();          
 		var ano4    = data.getFullYear(); 
-
 
 		var str_data = ano4 + '-' + (mes+1) + '-' + dia;
 
