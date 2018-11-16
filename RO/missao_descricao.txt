@@ -1,17 +1,17 @@
 par fonte destino
 par 1-3, depois retorna rota
 cada chamada gera par diferente entre si randomico
-um par radomico pode gerar um par j· buscado, neste caso o caminho antigo deve ser considerado ocupado, ent„o deve-se buscar caminho diferente.
-se n„o h· mais caminhos diferentes para esse par ele deve considerar que houve bloqueio de onda para esse par de rota.
-deve-se gerar arquivo da gerada de chamadas autom·ticas.
+um par radomico pode gerar um par j√° buscado, neste caso o caminho antigo deve ser considerado ocupado, ent√£o deve-se buscar caminho diferente.
+se n√£o h√° mais caminhos diferentes para esse par ele deve considerar que houve bloqueio de onda para esse par de rota.
+deve-se gerar arquivo da gerada de chamadas autom√°ticas.
 
 
-ok 1- criaÁ„o da interface
-   1.1 - interface gerar arquivo de interface para recuperar futuramente(xml,txt,json,bd)
-ok 2- gerar chamadas autom·ticas
-ok 2.2 colocacar inputtext para extabelecer a quantidade de chamadas a serem geradas
-   3- encontrar 'n' rotas a partir das rotas geradas em 2.2
-   3.1 gerar arquivo de busca
+ok 1- cria√ß√£o da interface
+ok 1.1 - interface gerar arquivo de interface para recuperar futuramente(xml,txt,json,bd)
+ok 2- gerar chamadas autom√°ticas
+ok 2.2 colocar inputtext para estabelecer a quantidade de chamadas a serem geradas
+ok 3- encontrar 'n' rotas a partir das rotas geradas em 2.2
+ok 3.1 gerar arquivo de busca
 	chamada = {
 		quantidade: 1000,
 		buscas=[ 

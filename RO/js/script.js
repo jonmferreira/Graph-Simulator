@@ -1,28 +1,115 @@
-﻿class Retangulo {
-  constructor(altura, largura) {
-    this.altura = altura;
-    this.largura = largura;
-  }	
-  calculaArea() {  
-        return this.altura * this.largura;  
-    }	
+﻿class Grafo{
+	
+	constructor(quantidadePoints){
+		this.infinito = Number.MAX_SAFE_INTEGER;
+		this.lengthVertices = quantidadePoints;
+		this.inicializarGrafo();
+	}
+	Infinito(){
+		return this.infinito;
+	}
+	inicializarGrafo(){
+		this.matrizADJ = [];
+		for(var i=0;i< this.lengthVertices;i++){
+	        let linha=[];
+	        this.matrizADJ.push(linha);
+	        for(var j=0;j<this.lengthVertices;j++){
+	        this.matrizADJ[i].push(this.infinito);//se tem ou nao ligação
+	        }
+    	}
+	}
+	setMatrizAdj(auxAdj){
+		for( let k=0; k < auxAdj.length; k++ ){
+	        for( let i=0; i< this.lengthVertices; i++ ){
+	            if( (auxAdj[k].u-1) == i){
+	            	let v = auxAdj[k].v-1;
+	                this.matrizADJ[i][ v ] =parseInt(auxAdj[k].peso);
+	                this.matrizADJ[ v ][i] =parseInt(auxAdj[k].peso);
+	            }
+	        }
+    	}
+	}
 }
-class Ponto {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
 
-    static distancia(a, b) {
-        const dx = a.x - b.x;
-        const dy = a.y - b.y;
+class GraphAlgoritms{
+	constructor(grafo){
+		this.infinito = grafo.Infinito();
+		this.graph = grafo;
+	}
 
-        return Math.sqrt(dx*dx + dy*dy);
-    }
+	menorCaminho(origem,destino){
+		
+		var saida =  this.menorCaminho_init(origem,destino);
+		return saida;
+	}
+	
+	menorCaminho_init(origem,destino){
+		this.saida = [];
+		this.caminho = [];
+	    var distancias = [];
+	    var visitados = [];
+	    var conj = [];
+	    var adj=[];
+		
+		var vertices= this.graph.lengthVertices;
+	    for(var i =0;i< vertices; i++){
+	        distancias.push(this.infinito );
+	        visitados.push(false);
+	    }
+
+	    this.caminho.push(origem);
+	    distancias[origem-1] = 0;
+	    conj.unshift(origem-1);
+		var u =  origem-1;
+
+		this.menorCaminho_loop(u,destino,distancias,conj,visitados);
+
+		var str_saida={
+			vetorDistacia: distancias,
+			custoPercusso:distancias[destino-1],
+			percusso: JSON.stringify(this.saida)
+		}; 
+		
+		return str_saida;
+	}
+
+	menorCaminho_loop(u,fim,distancias,conj,visitados){
+		var u=  conj.pop();
+
+		if(visitados[u]==false){
+			visitados[u]=true;
+			var adj = this.graph.matrizADJ[u];
+			for(var i =0;i<adj.length;i++){
+				var v= i;
+				if(this.graph.matrizADJ[u][v] != this.infinito ){
+					if(distancias[v] > distancias[u]+this.graph.matrizADJ[u][v]){
+
+						distancias[v]= distancias[u]+this.graph.matrizADJ[u][v];//atualiza
+						conj.unshift( v );
+						if( !this.atualizarCaminho(v,fim) ){
+							this.menorCaminho_loop(v,fim,distancias,conj,visitados);
+						}
+						this.caminho.pop();
+						visitados[v]=false;
+					}
+				}
+			}
+		}
+	}
+
+	atualizarCaminho(v,fim){
+		this.caminho.push(v+1);
+		if ( this.caminho[this.caminho.length-1] == fim){
+			this.saida=[];
+			for ( var i=0; i< this.caminho.length; i++){
+				this.saida.push(this.caminho[i]);
+			}
+			return true;
+		}
+		return false;
+	}
 }
-var p = new Retangulo();
-console.log(p);
-console.log(gerarChamadas(100));
+
 
 //================== teste acima		
 var game = new Phaser.Game(800, 400, Phaser.CANVAS, 'phaser-id',
@@ -45,8 +132,6 @@ var inputType;
 var lineOn=false;
 var enterKey;
 var connection = 0;
-var grafo = [];
-var linha = [];
 var makeLine = false;
 var peso='';
 var enterStop;
@@ -66,7 +151,6 @@ var etapa = {
 
 //Configuração de teclas de entrada de dados
 function config_buttons(){
-	console.log(etapa);
 	//config teclas
 	enterOri = game.input.keyboard.addKey(Phaser.Keyboard.O);
 	enterDest = game.input.keyboard.addKey(Phaser.Keyboard.D);
@@ -113,11 +197,7 @@ function update() {
 		  	etapa.em_execucao = 0;
 			etapa.fase = 3;
 			flag=true;
-			criarGrafo();
-			//game.paused = true;
 			salvarEstagio();
-			
-			calculo_final = true;
 			show=1;
 		  }
 		  if (enterKey.isDown){
@@ -127,43 +207,22 @@ function update() {
 		  if ( etapa.em_execucao ){
 		  	connectLine();
 		  }
-
 		  break;
-		case 5:
-		etapa.fase = 6;
-		menorCaminho_init(parseInt(ori),parseInt(dest));
-		calculo_final= false;
-		break;
+		case 3:
+			var selection ;
+
+            do{
+    			selection = parseInt(prompt("Please enter a number from 1 to 1000", "Chamadas"), 10);
+			}while(isNaN(selection) || selection > 1000 || selection < 1);
+			
+			criarGrafo(selection);
+			etapa.fase = 4;
+			break;
 		default:
 		console.log("saindo da faixa de fase");
 	}
     
-    if(calculo_final){
-    	if(enterOri.isDown){
-			var selection ;
-            do{
-    			selection = parseInt(prompt("Please enter a number from 1 to " + points.length, "peso"), 10);
-			}while(isNaN(selection) || selection > points.length || selection < 1);
-			peso = selection;
-			ori = peso; 
-			etapa.fase = 4;
-			etapa.em_execucao =0;
-			show =1;
-        }
-        if(enterDest.isDown){
-
-        	var selection ;
-            do{
-    			selection = parseInt(prompt("Please enter a number from 1 to " + points.length, "peso"), 10);
-			}while(isNaN(selection) || selection > points.length || selection < 1);
-			peso = selection;
-			dest = peso; 
-			etapa.fase = 5;
-			etapa.em_execucao =0;
-			show =1;
-			peso = '';	
-        }
-    }
+    
     exibirLinhas();
 }
 
@@ -260,8 +319,8 @@ function connectLine() {
     for(var i=0;i<points.length;i++){
        
         if(this.connection<2){
-            console.log("ele esta tentando conectar linhas");
-             points[i].events.onInputDown.add(getPoints, this,points[i]);
+            
+            points[i].events.onInputDown.add(getPoints, this,points[i]);
         }else{
 			//TODO::DÁ PRA TRANSFORMAR ISSO AQUI NUMA ESTRUTURA MELHOR
 			var aux = {
@@ -358,170 +417,8 @@ function salvar(obj) {
 		var blob = new Blob([obj], { type: "text/plain;charset=utf-8" });
 		saveAs(blob, titulo + ".txt");
 }
-function criarGrafo(){
-	var inf= Number.MAX_SAFE_INTEGER;
-    for(var i=0;i<points.length;i++){
-        linha=[];
-        grafo.push(linha);
-        for(var j=0;j<points.length;j++){
-        grafo[i].push(-1);//se tem ou nao ligação
-        }
-    }
-    
-    for(var k=0;k<auxAdj.length;k++){
-        for(var i=0;i<points.length;i++){
-            if( (auxAdj[k].u-1) == i){
-                grafo[i][(auxAdj[k].v-1)] =parseInt(auxAdj[k].peso);
-                grafo[(auxAdj[k].v-1)][i] =parseInt(auxAdj[k].peso);
-            }
-        }
-    }
-}
-
-var caminho=[];
-var saida=[];
-function menorCaminho_init(origem,destino){
-	origem = origem;
-	destino= destino;
-    var dist = [];
-    var visitados = [];
-    var conj = [];
-    var adj=[];
-	caminho.push(origem);
-	var vertices= points.length;
-	var inf= Number.MAX_SAFE_INTEGER;
-    for(var i =0;i<points.length;i++){
-        dist.push(inf);
-        visitados.push(false);
-    }
-    dist[origem-1]=0;
-    conj.unshift(origem-1);
-	var u=  conj[conj.length-1];
-	menorCaminho_loop(u,destino,dist,conj,visitados,adj);
-    console.log(dist);
-	console.log(saida);
-	//console.log(enlaces);
-	str_saida= "distancia: "+JSON.stringify(dist)
-	+"saida: "+ JSON.stringify(saida);
-	atualizarLog(str_saida);
-}
-
-function menorCaminho_loop(u,fim,dist,conj,visitados,adj){
-	var u=  conj[conj.length-1];
-    conj.pop();
-
-	if(visitados[u]==false){
-		visitados[u]=true;
-		adj = grafo[u];
-		
-		for(var i =0;i<adj.length;i++){
-			if(adj[i]!=-1){//se tem ligação
-				var v= i;
-				if(dist[v] > dist[u]+grafo[u][v]){
-					dist[v]= dist[u]+grafo[u][v];//atualiza
-					caminho.push(v+1);
-					conj.unshift( v );
-					if ( caminho[caminho.length-1] == fim){
-						saida=[];
-						for ( var i=0; i< caminho.length; i++){
-							saida.push(caminho[i]);
-						}
-					}else{
-						menorCaminho_loop(v,fim,dist,conj,visitados,adj)
-					}
-					caminho.pop();
-					visitados[v]=false;
-				}
-			}
-		}
-	}
-}
 
 
-
-function create_enlace(){
-	var enlace = {
-		noA: 0,
-		noB : 0,
-		peso : 0,
-		y : [],
-		firstfit: [],
-		nome : function() {
-			return this.noA + "-" + this.noB;
-		},
-		addComprimento_de_Onda: function(c_onda){
-			this.y.push(c_onda);
-			this.firstfit.push(true);
-		}, 
-		criar: function(a,b,peso){
-			this.noA=a;
-			this.noB=b;
-			this.peso= peso;
-		},
-		checar_disponibilidade: function(c_onda){
-			for( var i=0; i< y.length; i++){
-				if( c_onda == this.y[i] && this.firstfit[i]){
-					return i;
-				}
-			}
-			return -1;
-		}, 
-		estabelecer_chamada: function(c_onda){
-			var i = this.checar_disponibilidade(c_onda);
-			if( i !=-1 ){
-				this.firstfit[i]= false;
-			}
-		},
-		getOnda_Livre: function(){
-			for( var i=0; i< this.firstfit.length; i++){
-				if ( this.firstfit[i]){
-					return y[i];
-				}
-			}
-			return "null";
-		}
-	};
-	return enlace;
-}
-
-function gerarChamadas(quantidade){
-	var points= [0,0,0,0];
-    chamadas ={
-    	quantidade: quantidade,
-    	buscas : [],
-    	verificacoes : [/*{ rota:"1-2",caminho:'1-2', ditancia:120(int)}*/],
-    	alocar_chamada : function(u,v){
-    		var disponivel= true;
-    		for (var i=0; i< this.buscas.length && disponivel;i++){
-    			if( this.buscas[i].par == ""+u+"-"+v  || this.buscas[i].par == ""+v+"-"+u){
-    				disponivel= false;
-    			}
-    		}
-    		return disponivel;
-    	}
-    };
-	for(var i=1;i<=quantidade;i++ ){
-		var u = getRandomInt(1, points.length);
-		var v = getRandomInt(1, points.length);
-		while (u==v){
-			var v = getRandomInt(1, points.length);
-		}
-		if (u>v){
-			t =u; u=v; v=t;
-		}
-		chamada = {
-			par:""+u+"-"+v,
-			solicitacao:0,//quantidade de recorrencua
-			caminhos:[
-			/*{rota:'1-2',distancia:120(int)}*/] ,
-			prob_erro: function(){
-				return caminhos.length/solicitacao;
-			}
-		}
-		chamadas.buscas.push(chamada);
-	}
-	return chamadas;
-}
 
 function getPoints (point) {
   
@@ -536,4 +433,79 @@ function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function gerarChamadas(quantidade, totalPontos){
+	
+    chamadas ={
+    	quantidade: quantidade,
+    	buscas : [],
+    	verificacoes : [],
+    	alocar_chamada : function(u,v){
+    		var disponivel= -1;
+    		for (var i=0; i< this.buscas.length && disponivel==-1;i++){
+    			if( this.buscas[i].par == ""+u+"-"+v  || this.buscas[i].par == ""+v+"-"+u){
+    				disponivel= i;
+    			}
+    		}
+    		return disponivel;
+    	}
+    };
+
+	for(var i=1;i<=quantidade;i++ ){
+		var u = getRandomInt(1, totalPontos);
+		var v = getRandomInt(1, totalPontos);
+		console.log(""+u+" e "+v+" e total"+totalPontos);
+		while (u==v){
+			var v = getRandomInt(1, totalPontos);
+		}
+		if (u>v){
+			var t =u; u=v; v=t;
+		}
+		let j = chamadas.alocar_chamada(u,v);
+		if( j == -1){
+			var chamada = {
+				par:""+u+"-"+v,
+				u:u,
+				v:v,
+				solicitacao:1,//quantidade de recorrencua
+				caminhos:[
+				/*{rota:'1-2',distancia:120(int)}*/] ,
+				prob_erro: function(){
+					return caminhos.length/solicitacao;
+				}
+			}
+			chamadas.buscas.push(chamada);
+		}
+		else {
+			chamadas.buscas[j].solicitacao ++;
+		}
+
+		var verificacao = {
+			par:""+u+"-"+v,
+			u:u,
+			v:v,
+			caminho:"",
+			distancia:-1
+		}
+		chamadas.verificacoes.push(verificacao);
+		console.log(chamadas);
+	}
+	return chamadas;
+}
+	
+function criarGrafo(ahan){
+	grafo = new Grafo(points.length);
+	grafo.setMatrizAdj(auxAdj);
+	graphAlgoritms= new GraphAlgoritms( grafo );
+
+	calls = gerarChamadas(ahan, points.length);
+	for( let i =0;i< calls.quantidade;i++){
+		var u = calls.verificacoes[i].u;
+		var v = calls.verificacoes[i].v;
+		r = graphAlgoritms.menorCaminho( u, v );
+		calls.verificacoes[i].caminho= r.percusso;
+		calls.verificacoes[i].distancia = r.custoPercusso;
+	}
+	console.log(calls);
 }
