@@ -110,12 +110,12 @@ class GraphAlgoritms{
 	}
 }
 
-function criarGrafo(ahan){
+function criarGrafoChamadas(quantidadeChamadas){
 	grafo = new Grafo(points.length);
 	grafo.setMatrizAdj(dataLinhasPontos);
 	graphAlgoritms= new GraphAlgoritms( grafo );
 
-	calls = gerarChamadas(ahan, points.length);
+	calls = gerarChamadas(quantidadeChamadas, points.length);
 	for( let i =0;i< calls.quantidade;i++){
 		var u = calls.verificacoes[i].u;
 		var v = calls.verificacoes[i].v;
@@ -152,9 +152,72 @@ class BuscaChamada{
 		return this.caminhos.length/solicitacao;
 	}
 }
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
+class RedesOticas{
+	constructor(points, rotas){
+		this.points = points;
+		this.rotas = rotas;
+	}
 
-//================== teste acima		
+}
+
+function gerarChamadas(quantidade, totalPontos){
+	
+    chamadas ={
+    	quantidade: quantidade,
+    	buscas : [],
+    	verificacoes : [],
+    	alocar_chamada : function(u,v){
+    		var disponivel= -1;
+    		for (var i=0; i< this.buscas.length && disponivel==-1;i++){
+    			if( this.buscas[i].par == ""+u+"-"+v  || this.buscas[i].par == ""+v+"-"+u){
+    				disponivel= i;
+    			}
+    		}
+    		return disponivel;
+    	}
+    };
+
+	for(var i=1;i<=quantidade;i++ ){
+		var u = getRandomInt(1, totalPontos);
+		var v = getRandomInt(1, totalPontos);
+		while (u==v){
+			var v = getRandomInt(1, totalPontos);
+		}
+		if (u>v){
+			var t =u; u=v; v=t;
+		}
+		let j = chamadas.alocar_chamada(u,v);
+		if( j == -1){
+			var chamada = {
+				par:""+u+"-"+v,
+				u:u,
+				v:v,
+				solicitacao:1,//quantidade de recorrencua
+				caminhos:[
+				/*{rota:'1-2',distancia:120(int)}*/] ,
+				prob_erro: function(){
+					return caminhos.length/solicitacao;
+				}
+			}
+			chamadas.buscas.push(chamada);
+		}
+		else {
+			chamadas.buscas[j].solicitacao ++;
+		}
+
+		var verificacao = new VerificacaoChamada(u,v);
+		chamadas.verificacoes.push(verificacao);
+	}
+	return chamadas;
+}
+
+//================== Logica do phaser		
 var game = new Phaser.Game(600, 400, Phaser.CANVAS, 'phaser-id',
  { preload: preload, create: create, update: update, render:render});
 
@@ -263,14 +326,13 @@ function update() {
             do{
     			selection = parseInt(prompt("Please enter a number from 1 to 1000", "Chamadas"), 10);
 			}while(isNaN(selection) || selection > 1000 || selection < 1);
-			criarGrafo(selection);
+			criarGrafoChamadas(selection);
 			etapa.fase = 4;
 			break;
 		default:
 		//console.log("saindo da faixa de fase");
 	}
 }
-
 
 function render(){
 	//adiciona indicie a bolinha
@@ -302,34 +364,6 @@ function exibirLinhas(){
     }
 }
 
-// FUNÇÕES DE APOIO DO PROJETO
-function ajuda(){
-	show = 1;
-	projeto();
-}
-
-function projeto(){
-	if(show ==1){
-		show++;
-		if(etapa.fase ==1){
-			alert("Coloque os pontos clicando."+"\n"+"Para encerrar a inserção de pontos aperte a tecla \"space\".");
-		}
-		if(etapa.fase ==2){
-			
-			alert("\n\nPara começar a inserir as arestas aperte a tecla \"enter\" :"+
-			"\nDiga o valor do peso e clique nos dois vertices que deseja criar a aresta."+
-			"\n\nPara encerrar,aperte a tecla \"s\".");
-		}
-	}
-}
-
-// FUNÇÕES CHAVE DE EXECUÇÃO DO PROJETO
-function atualizarLog(strvalue){
-	document.getElementById("logview").textContent=strvalue;
-}
-function actionOnClick (valor) {
-   atualizarLog("Peso acumulado: "+peso);
-}
 //Adiciona pontos na tela
 function onTapHandler(pointer, doubleTap) {
     if (!overTap)
@@ -409,9 +443,25 @@ function resetFindParPoint(){
 		adjPesos = [];
 		peso = '';
 }
-/*
-CALCULO DE DISTANCIA
-*/
+
+function getPoint(id){
+	return points[id-1];
+}
+
+function getPoints (point) {
+  
+   adjPesos.push(points.indexOf(point)+1);
+   this.connection+=1;
+}
+
+function setDataLinhasPontos(){
+	setInputTap(false);
+	etapa.fase = 3;
+	makeLine = true;
+	game.paused = false;
+}
+
+//==================== Salvar layout
 function salvarEstagio(){
 	save = {"grafo":{
 	points: points.map(function (point){
@@ -427,104 +477,21 @@ function salvarEstagio(){
 	}};
     salvar(JSON.stringify(save));
 }
+
 function salvar(obj) {
+	
 		let titulo = "graph";
-
 		var data = new Date();
-
 		var dia     = data.getDate();            
 		var mes     = data.getMonth();          
 		var ano4    = data.getFullYear(); 
-
 		var str_data = ano4 + '-' + (mes+1) + '-' + dia;
-
 		titulo+= str_data;
-
 		var blob = new Blob([obj], { type: "text/plain;charset=utf-8" });
 		saveAs(blob, titulo + ".txt");
 }
 
-
-function getPoint(id){
-	return points[id-1];
-}
-
-function getPoints (point) {
-  
-   adjPesos.push(points.indexOf(point)+1);
-   this.connection+=1;
-}
-
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-class RedesOticas{
-	constructor(points, rotas){
-		this.points = points;
-		this.rotas = rotas;
-	}
-
-}
-
-function gerarChamadas(quantidade, totalPontos){
-	
-    chamadas ={
-    	quantidade: quantidade,
-    	buscas : [],
-    	verificacoes : [],
-    	alocar_chamada : function(u,v){
-    		var disponivel= -1;
-    		for (var i=0; i< this.buscas.length && disponivel==-1;i++){
-    			if( this.buscas[i].par == ""+u+"-"+v  || this.buscas[i].par == ""+v+"-"+u){
-    				disponivel= i;
-    			}
-    		}
-    		return disponivel;
-    	}
-    };
-
-	for(var i=1;i<=quantidade;i++ ){
-		var u = getRandomInt(1, totalPontos);
-		var v = getRandomInt(1, totalPontos);
-		while (u==v){
-			var v = getRandomInt(1, totalPontos);
-		}
-		if (u>v){
-			var t =u; u=v; v=t;
-		}
-		let j = chamadas.alocar_chamada(u,v);
-		if( j == -1){
-			var chamada = {
-				par:""+u+"-"+v,
-				u:u,
-				v:v,
-				solicitacao:1,//quantidade de recorrencua
-				caminhos:[
-				/*{rota:'1-2',distancia:120(int)}*/] ,
-				prob_erro: function(){
-					return caminhos.length/solicitacao;
-				}
-			}
-			chamadas.buscas.push(chamada);
-		}
-		else {
-			chamadas.buscas[j].solicitacao ++;
-		}
-
-		var verificacao = new VerificacaoChamada(u,v);
-		chamadas.verificacoes.push(verificacao);
-	}
-	return chamadas;
-}
-
-
-	
-
-
-// leitura de arquivo
+// leitura de arquivo =======================
 function fileSelect(files) {
     var f = files[0]; // FileList object
     var output = [];
@@ -559,6 +526,8 @@ function fileSelect(files) {
 	}
 }
 
+//====================== verificações de API
+
 function verificacaoInicial(){
 	// Check for the various File API support.
 	if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -568,9 +537,31 @@ function verificacaoInicial(){
 	}
 }
 
-function setDataLinhasPontos(){
-	setInputTap(false);
-	etapa.fase = 3;
-	makeLine = true;
-	game.paused = false;
+// ===================== FUNÇÕES DE APOIO DO PROJETO ===== QUE PODEM SER MUDADO
+function ajuda(){
+	show = 1;
+	projeto();
+}
+
+function projeto(){
+	if(show ==1){
+		show++;
+		if(etapa.fase ==1){
+			alert("Coloque os pontos clicando."+"\n"+"Para encerrar a inserção de pontos aperte a tecla \"space\".");
+		}
+		if(etapa.fase ==2){
+			
+			alert("\n\nPara começar a inserir as arestas aperte a tecla \"enter\" :"+
+			"\nDiga o valor do peso e clique nos dois vertices que deseja criar a aresta."+
+			"\n\nPara encerrar,aperte a tecla \"s\".");
+		}
+	}
+}
+
+// FUNÇÕES CHAVE DE EXECUÇÃO DO PROJETO
+function atualizarLog(strvalue){
+	document.getElementById("logview").textContent=strvalue;
+}
+function actionOnClick (valor) {
+   atualizarLog("Peso acumulado: "+peso);
 }
