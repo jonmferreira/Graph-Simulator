@@ -173,8 +173,8 @@ function getStart(){
 }
 
 function setInputTap(pode){
-	currentPoint.visible= go;
-	currentPoint.inputEnabled = go;
+	currentPoint.visible= pode;
+	currentPoint.inputEnabled = pode;
 	overTap= !pode;
 }
 
@@ -184,6 +184,10 @@ function update() {
     	case 0:
     		setInputTap(false);
     		game.paused = true;
+    		if ( etapa.em_execucao==0 ){
+    			verificacaoInicial();
+    			etapa.em_execucao = 1;
+    		}
     		break;
     	case 1:
     	if(!spaceKey.isDown){
@@ -193,7 +197,6 @@ function update() {
 			setInputTap(false);
 	        etapa.fase=2;
 			etapa.em_execucao = 0;	
-			
 		}
 		break;
 		case 2:
@@ -223,14 +226,6 @@ function update() {
 		default:
 		//console.log("saindo da faixa de fase");
 	}
-}
-function setDataLinhasPontos(){
-	
-	// jogo pausado?
-	setInputTap(false);
-	etapa.fase = 3;
-	//configurar vector points
-	//configurar dataLinhasPontos;
 }
 
 
@@ -381,10 +376,10 @@ function salvarEstagio(){
 			saveObject.x = point.x;
 			saveObject.y = point.y;
 			saveObject.indice = point.indice;
-			return JSON.stringify(saveObject);
+			return saveObject;//JSON.stringify(saveObject);
 		}),
 		dataLinhasPontos:dataLinhasPontos.map(function(adj){
-			return adj.getjson();
+			return adj;//adj.getjson();
 		})
 	}};
     salvar(JSON.stringify(save));
@@ -414,10 +409,8 @@ function getPoint(id){
 function getPoints (point) {
   
    adjPesos.push(points.indexOf(point)+1);
-  
    this.connection+=1;
 }
-
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -425,19 +418,12 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-
 class RedesOticas{
 	constructor(points, rotas){
 		this.points = points;
 		this.rotas = rotas;
 	}
 
-}
-
-class MapaProjeto{
-	constructor(altura, largura){
-
-	}
 }
 
 function gerarChamadas(quantidade, totalPontos){
@@ -513,4 +499,55 @@ function criarGrafo(ahan){
 		calls.verificacoes[i].distancia = r.custoPercusso;
 	}
 	console.log(calls);
+}
+
+// leitura de arquivo
+function fileSelect(files) {
+    var f = files[0]; // FileList object
+    var output = [];
+    
+    if (f != null){
+    	var leitor = new FileReader();
+		leitor.onload = leCSV;
+		leitor.readAsText(f);
+    }	
+    function leCSV(evt) {
+		var fileArr = evt.target.result;
+		var saveObject = JSON.parse(fileArr).grafo; 
+
+		criarPontos(saveObject);
+		criarDataPoints(saveObject);
+		setDataLinhasPontos();
+	}
+	function criarPontos(saveObject){
+		this.points = [];
+		for( let i=0;i<saveObject.points.length;i++ ){
+			var img = createImg(saveObject.points[i].x, saveObject.points[i].y, saveObject.points[i].indice);
+        	this.points.push(img);
+		}
+	}
+	function criarDataPoints(saveObject){
+		this.dataLinhasPontos = [];
+		for( let i=0;i<saveObject.dataLinhasPontos.length; i++ ){
+			data = saveObject.dataLinhasPontos[i];
+			aux = configParPoint(data.u,data.v,data.peso);
+			this.dataLinhasPontos.push(aux);
+		}
+	}
+}
+
+function verificacaoInicial(){
+	// Check for the various File API support.
+	if (window.File && window.FileReader && window.FileList && window.Blob) {
+	  // Great success! All the File APIs are supported.
+	} else {
+	  alert('The File APIs are not fully supported in this browser.');
+	}
+}
+
+function setDataLinhasPontos(){
+	setInputTap(false);
+	etapa.fase = 3;
+	makeLine = true;
+	game.paused = false;
 }
