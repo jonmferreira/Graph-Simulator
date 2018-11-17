@@ -126,6 +126,26 @@ function criarGrafoChamadas(quantidadeChamadas){
 	console.log(calls);
 }
 
+class Chamadas{
+	constructor(quantidade){
+		
+    	this.quantidade = quantidade;
+    	this.buscas = [];
+    	this.verificacoes = [];
+	}
+	alocar_chamada(u,v){
+    	var disponivel= -1;
+    	for (var i=0; i< this.buscas.length && disponivel== -1 ;i++){
+    		if( this.buscas[i].par == ""+u+"-"+v  || this.buscas[i].par == ""+v+"-"+u){
+    			disponivel= i;
+    		}
+    	}
+    	return disponivel;
+    }
+    // criar function static de gerarChamadas
+}
+
+
 class VerificacaoChamada{
 	constructor(u,v){
 		this.par=""+u+"-"+v,
@@ -145,43 +165,30 @@ class BuscaChamada{
 		this.par=""+u+"-"+v,
 		this.u = u;
 		this.v = v;
-		this.caminho = "";
-		this.distancia=-1;
+		this.caminhos = [];
+		this.solicitacao = 1;
 	}
 	prob_Erro(){
-		return this.caminhos.length/solicitacao;
+		return this.caminhos.length/this.solicitacao;
 	}
 }
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
+function getRandomInt(min, max) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+//== no futuro passar tudo para duas classes
 class RedesOticas{
 	constructor(points, rotas){
 		this.points = points;
 		this.rotas = rotas;
 	}
-
 }
 
 function gerarChamadas(quantidade, totalPontos){
 	
-    chamadas ={
-    	quantidade: quantidade,
-    	buscas : [],
-    	verificacoes : [],
-    	alocar_chamada : function(u,v){
-    		var disponivel= -1;
-    		for (var i=0; i< this.buscas.length && disponivel==-1;i++){
-    			if( this.buscas[i].par == ""+u+"-"+v  || this.buscas[i].par == ""+v+"-"+u){
-    				disponivel= i;
-    			}
-    		}
-    		return disponivel;
-    	}
-    };
+    var chamadas = new Chamadas(quantidade);
 
 	for(var i=1;i<=quantidade;i++ ){
 		var u = getRandomInt(1, totalPontos);
@@ -194,17 +201,7 @@ function gerarChamadas(quantidade, totalPontos){
 		}
 		let j = chamadas.alocar_chamada(u,v);
 		if( j == -1){
-			var chamada = {
-				par:""+u+"-"+v,
-				u:u,
-				v:v,
-				solicitacao:1,//quantidade de recorrencua
-				caminhos:[
-				/*{rota:'1-2',distancia:120(int)}*/] ,
-				prob_erro: function(){
-					return caminhos.length/solicitacao;
-				}
-			}
+			var chamada = new BuscaChamada(u,v);
 			chamadas.buscas.push(chamada);
 		}
 		else {
@@ -479,7 +476,7 @@ function salvarEstagio(){
 }
 
 function salvar(obj) {
-	
+
 		let titulo = "graph";
 		var data = new Date();
 		var dia     = data.getDate();            
