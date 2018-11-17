@@ -110,6 +110,49 @@ class GraphAlgoritms{
 	}
 }
 
+function criarGrafo(ahan){
+	grafo = new Grafo(points.length);
+	grafo.setMatrizAdj(dataLinhasPontos);
+	graphAlgoritms= new GraphAlgoritms( grafo );
+
+	calls = gerarChamadas(ahan, points.length);
+	for( let i =0;i< calls.quantidade;i++){
+		var u = calls.verificacoes[i].u;
+		var v = calls.verificacoes[i].v;
+		r = graphAlgoritms.menorCaminho( u, v );
+		calls.verificacoes[i].caminho= r.percusso;
+		calls.verificacoes[i].distancia = r.custoPercusso;
+	}
+	console.log(calls);
+}
+
+class VerificacaoChamada{
+	constructor(u,v){
+		this.par=""+u+"-"+v,
+		this.u = u;
+		this.v = v;
+		this.caminho = "";
+		this.distancia=-1;
+	}
+	setData(caminho,distancia){
+		this.caminho = caminho;
+		this.distancia = distancia;
+	}
+}
+
+class BuscaChamada{
+	constructor(u,v){
+		this.par=""+u+"-"+v,
+		this.u = u;
+		this.v = v;
+		this.caminho = "";
+		this.distancia=-1;
+	}
+	prob_Erro(){
+		return this.caminhos.length/solicitacao;
+	}
+}
+
 
 //================== teste acima		
 var game = new Phaser.Game(600, 400, Phaser.CANVAS, 'phaser-id',
@@ -415,7 +458,7 @@ function getPoints (point) {
 function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 class RedesOticas{
@@ -446,7 +489,6 @@ function gerarChamadas(quantidade, totalPontos){
 	for(var i=1;i<=quantidade;i++ ){
 		var u = getRandomInt(1, totalPontos);
 		var v = getRandomInt(1, totalPontos);
-		console.log(""+u+" e "+v+" e total"+totalPontos);
 		while (u==v){
 			var v = getRandomInt(1, totalPontos);
 		}
@@ -472,34 +514,15 @@ function gerarChamadas(quantidade, totalPontos){
 			chamadas.buscas[j].solicitacao ++;
 		}
 
-		var verificacao = {
-			par:""+u+"-"+v,
-			u:u,
-			v:v,
-			caminho:"",
-			distancia:-1
-		}
+		var verificacao = new VerificacaoChamada(u,v);
 		chamadas.verificacoes.push(verificacao);
-		console.log(chamadas);
 	}
 	return chamadas;
 }
-	
-function criarGrafo(ahan){
-	grafo = new Grafo(points.length);
-	grafo.setMatrizAdj(dataLinhasPontos);
-	graphAlgoritms= new GraphAlgoritms( grafo );
 
-	calls = gerarChamadas(ahan, points.length);
-	for( let i =0;i< calls.quantidade;i++){
-		var u = calls.verificacoes[i].u;
-		var v = calls.verificacoes[i].v;
-		r = graphAlgoritms.menorCaminho( u, v );
-		calls.verificacoes[i].caminho= r.percusso;
-		calls.verificacoes[i].distancia = r.custoPercusso;
-	}
-	console.log(calls);
-}
+
+	
+
 
 // leitura de arquivo
 function fileSelect(files) {
