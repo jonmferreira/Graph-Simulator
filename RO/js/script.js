@@ -1,4 +1,12 @@
-﻿class Grafo{
+﻿// usando objetos ele altera valor do atributo
+asas={x:2};
+function as(ass){
+	ass.x= 1;
+}
+as(asas);
+console.log(asas);
+//========== teste acima
+class Grafo{
 	
 	constructor(quantidadePoints){
 		this.infinito = Number.MAX_SAFE_INTEGER;
@@ -30,7 +38,7 @@
     	}
 	}
 }
-
+//criar funcao de menor caminho otico
 class GraphAlgoritms{
 	constructor(grafo){
 		this.infinito = grafo.Infinito();
@@ -81,6 +89,7 @@ class GraphAlgoritms{
 			var adj = this.graph.matrizADJ[u];
 			for(var i =0;i<adj.length;i++){
 				var v= i;
+				//nesta verificação, vc tbm verifica se há caminho disponível
 				if(this.graph.matrizADJ[u][v] != this.infinito ){
 					if(distancias[v] > distancias[u]+this.graph.matrizADJ[u][v]){
 
@@ -109,13 +118,14 @@ class GraphAlgoritms{
 		return false;
 	}
 }
-
+//Talves essa funcção deva estar dentro de uma classe Redes Oticas//ultima prioridade
 function criarGrafoChamadas(quantidadeChamadas){
 	grafo = new Grafo(points.length);
 	grafo.setMatrizAdj(dataLinhasPontos);
 	graphAlgoritms= new GraphAlgoritms( grafo );
 
-	calls = gerarChamadas(quantidadeChamadas, points.length);
+	calls = Chamadas.gerarChamadas(quantidadeChamadas, points.length);
+	//essa parte de baixo vai parte de executar chamada dentro da função Chamada mesmo
 	for( let i =0;i< calls.quantidade;i++){
 		var u = calls.verificacoes[i].u;
 		var v = calls.verificacoes[i].v;
@@ -125,6 +135,8 @@ function criarGrafoChamadas(quantidadeChamadas){
 	}
 	console.log(calls);
 }
+
+
 
 class Chamadas{
 	constructor(quantidade){
@@ -142,51 +154,16 @@ class Chamadas{
     	}
     	return disponivel;
     }
-    // criar function static de gerarChamadas
-}
+    addChamda(){
 
+    }
+    addVerificacao(){
 
-class VerificacaoChamada{
-	constructor(u,v){
-		this.par=""+u+"-"+v,
-		this.u = u;
-		this.v = v;
-		this.caminho = "";
-		this.distancia=-1;
-	}
-	setData(caminho,distancia){
-		this.caminho = caminho;
-		this.distancia = distancia;
-	}
-}
+    }
+    realizarVerificoes(){
 
-class BuscaChamada{
-	constructor(u,v){
-		this.par=""+u+"-"+v,
-		this.u = u;
-		this.v = v;
-		this.caminhos = [];
-		this.solicitacao = 1;
-	}
-	prob_Erro(){
-		return this.caminhos.length/this.solicitacao;
-	}
-}
-
-function getRandomInt(min, max) {
-	min = Math.ceil(min);
-	max = Math.floor(max);
-	return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-//== no futuro passar tudo para duas classes
-class RedesOticas{
-	constructor(points, rotas){
-		this.points = points;
-		this.rotas = rotas;
-	}
-}
-
-function gerarChamadas(quantidade, totalPontos){
+    }
+    static gerarChamadas(quantidade, totalPontos){
 	
     var chamadas = new Chamadas(quantidade);
 
@@ -212,6 +189,66 @@ function gerarChamadas(quantidade, totalPontos){
 		chamadas.verificacoes.push(verificacao);
 	}
 	return chamadas;
+}
+    // criar function static de gerarChamadas
+}
+
+
+class VerificacaoChamada{
+	constructor(u,v){
+		this.par=""+u+"-"+v,
+		this.u = u;
+		this.v = v;
+		this.caminho = "";
+		this.distancia=-1;
+	}
+	setData(caminho,distancia){
+		this.caminho = caminho;
+		this.distancia = distancia;
+	}
+}
+
+class BuscaChamada{
+	constructor(u,v){
+		this.par=""+u+"-"+v,
+		this.u = u;
+		this.v = v;
+		this.caminhos = [/*{class caminho}*/];
+		this.solicitacao = 1;
+	}
+	prob_Erro(){
+		return this.caminhos.length/this.solicitacao;
+	}
+	isBuscado(rota){
+		var buscado = false;
+		for (let i=0; i< this.caminhos.length && !buscado;i++){
+			buscado = this.caminhos[i].equals(rota);
+		}
+		return buscado;
+	}
+}
+
+class Caminho{
+	constructor(rota,distancia){
+		this.rota = rota;
+		this.distancia = distancia;
+	}
+	equals(rota){
+		return this.rota.localeCompare(rota)==0;
+	}
+}
+
+function getRandomInt(min, max) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+//== no futuro passar tudo para duas classes
+class RedesOticas{
+	constructor(points, rotas){
+		this.points = points;
+		this.rotas = rotas;
+	}
 }
 
 //================== Logica do phaser		
