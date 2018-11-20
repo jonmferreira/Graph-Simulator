@@ -112,7 +112,7 @@ class GraphAlgoritms{
 
 
 //================== teste acima		
-var game = new Phaser.Game(600, 400, Phaser.CANVAS, 'phaser-id',
+var game = new Phaser.Game(1011, 460, Phaser.CANVAS, 'phaser-id',
  { preload: preload, create: create, update: update, render:render});
 
 function preload() {

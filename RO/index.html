@@ -9,88 +9,33 @@
 	<script type="text/javascript" src="js/FileSaver.min.js"></script>
     <link rel="stylesheet" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-	<style>
-	.btn {
-		border: none;
-		background-color: inherit;
-		padding: 14px 28px;
-		font-size: 16px;
-		cursor: pointer;
-		display: inline-block;
-	}
-
-	/* Green */
-	.success {
-		color: green;
-	}
-
-	.success:hover {
-		background-color: #4CAF50;
-		color: white;
-	}
-
-	/* Blue */
-	.info {
-		color: dodgerblue;
-	}
-
-	.info:hover {
-		background: #2196F3;
-		color: white;
-	}
-
-	/* Orange */
-	.warning {
-		color: orange;
-	}
-
-	.warning:hover {
-		background: #ff9800;
-		color: white;
-	}
-
-	/* Red */
-	.danger {
-		color: red;
-	}
-
-	.danger:hover {
-		background: #f44336;
-		color: white;
-	}
-
-	/* Gray */
-	.default {
-		color: black;
-	}
-
-	.default:hover {
-		background: #e7e7e7;
-	}
-	p {
-		border: 1px solid black;
-		border-radius: 5px;
-		width: 400px;
-		height: 400px;
-		background: skyblue;
-		padding-left: 1cm;
-		padding-top: 1cm;
-	}
-	
-	</style>
+	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
+
 <body onmousemove="projeto()" >
-	<div>
-		<h2>Simulador versão 2</h2>
-		<input type="file" id="files" onchange="fileSelect(this.files)" />
-		<button class="btn info">Buscar grafo salvo</button>
-		<button class="btn success" onclick="getStart()">Próxima etapa</button>
-		<button class="btn danger" onclick="ajuda()">Ajuda</button>
+
+	<header>
+		<h1>Simulador de Grafos</h1>
+	</header>
+
+	 <div class="row">
+  		<div class="column-1">
+  			<input type="file" id="files" onchange="fileSelect(this.files)" />
+			<button class="btn info">Buscar grafo salvo</button>
+			<button class="btn success" onclick="getStart()">Próxima etapa</button>
+			<button class="btn danger" onclick="ajuda()">Ajuda</button>
+			<div id="phaser-id"></div>
+  		</div>
+  		<div class="column-2">
+  			<p>LOG: </p>
+			<p id="logview"></p>
+  		</div>
+	</div> 
+
+
+	<div class="footer">
+  		<p>Desenvolvido por alunos da UEA/EST</p>
 	</div>
-	<div id="phaser-id"></div>
-	<div> 
-	<label>LOG::</label>
-	<p id="logview" >Comece clicando na tela</p>
-	</div>
+
 </body>
 </html>
