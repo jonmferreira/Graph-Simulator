@@ -68,7 +68,7 @@ body {
 	background-size: cover;
 }
 
-h1{
+h1,h3{
 	color: white;
 	font-family: Arial, Helvetica, sans-serif;
 	font-weight: bolder;
@@ -78,4 +78,12 @@ h1{
 .botoes {
 	text-align: center;
 	padding-top: 5cm;
+}
+
+
+.imgagem-1, .imagem-2{
+	position: absolute;
+    margin-left:150px;
+    margin-top:10px;  
+
 }
