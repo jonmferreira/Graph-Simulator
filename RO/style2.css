@@ -142,3 +142,16 @@ body{
 	margin-left:180px;
 	margin-top: 5px;	
 }
+
+#files{
+	background-color: inherit;
+	padding: 14px 28px;
+	font-size: 16px;
+	cursor: pointer;
+	display: inline-block;
+	border: 1px solid black;
+	border-radius: 5px;
+	background-color: white;
+	margin-left:300px;
+	margin-top: 30px;	
+}
