@@ -1,4 +1,7 @@
-﻿// usando objetos ele altera valor do atributo
+﻿//================== Logica do phaser		
+var game = new Phaser.Game(900, 500, Phaser.CANVAS, 'phaser-id',
+ { preload: preload, create: create, update: update, render:render});
+// usando objetos ele altera valor do atributo
 asas={x:2};
 function as(ass){
 	ass.x= 1;
@@ -249,8 +252,6 @@ class RedesOticas{
 }
 
 //================== Logica do phaser		
-var game = new Phaser.Game(900, 500, Phaser.CANVAS, 'phaser-id',
- { preload: preload, create: create, update: update, render:render});
 
 function preload() {
     game.load.spritesheet('centroid', 'img/balls.png', 17, 17);
@@ -301,6 +302,7 @@ function create() {
 	currentPoint.anchor.set(0.5);
 	currentPoint.alpha = 0.9;
 	game.input.onTap.add(onTapHandler, this);
+	
 }
 
 function getStart(){
@@ -321,6 +323,10 @@ function update() {
     	case 0:
     		setInputTap(false);
     		game.paused = true;
+    		saved= dataSaved();
+    		if( saved ){
+    			setDataLinhasPontos();
+    		}
     		if ( etapa.em_execucao==0 ){
     			verificacaoInicial();
     			etapa.em_execucao = 1;
@@ -358,7 +364,7 @@ function update() {
     			selection = parseInt(prompt("Please enter a number from 1 to 1000", "Chamadas"), 10);
 			}while(isNaN(selection) || selection > 1000 || selection < 1);
 			criarGrafoChamadas(selection);
-			etapa.fase = 4;
+			etapa.fase = 4;	
 			break;
 		default:
 		//console.log("saindo da faixa de fase");
@@ -487,8 +493,8 @@ function getPoints (point) {
 
 function setDataLinhasPontos(){
 	setInputTap(false);
-	etapa.fase = 3;
 	makeLine = true;
+	etapa.fase = 3;
 	game.paused = false;
 }
 
@@ -534,26 +540,39 @@ function fileSelect(files) {
     }	
     function leCSV(evt) {
 		var fileArr = evt.target.result;
+		console.log(result);
 		var saveObject = JSON.parse(fileArr).grafo; 
-
-		criarPontos(saveObject);
-		criarDataPoints(saveObject);
-		setDataLinhasPontos();
+		window.window.location.href="simulador.html";
+		sessionStorage.setItem('graph_simulatorSave', JSON.stringify(saveObject));
 	}
-	function criarPontos(saveObject){
-		this.points = [];
-		for( let i=0;i<saveObject.points.length;i++ ){
-			var img = createImg(saveObject.points[i].x, saveObject.points[i].y, saveObject.points[i].indice);
-        	this.points.push(img);
+}
+function dataSaved(){
+		var data = sessionStorage.getItem('graph_simulatorSave');
+		sessionStorage.removeItem('graph_simulatorSave');
+		saveObject = JSON.parse(data);
+		if( saveObject != null ){
+			criarPontos(saveObject);
+			criarDataPoints(saveObject);
+			return true;
+			//setDataLinhasPontos();
 		}
+		else return false;
+		
+		
 	}
-	function criarDataPoints(saveObject){
-		this.dataLinhasPontos = [];
-		for( let i=0;i<saveObject.dataLinhasPontos.length; i++ ){
-			data = saveObject.dataLinhasPontos[i];
-			aux = configParPoint(data.u,data.v,data.peso);
-			this.dataLinhasPontos.push(aux);
-		}
+function criarPontos(saveObject){
+	this.points = [];
+	for( let i=0;i<saveObject.points.length;i++ ){
+		var img = createImg(saveObject.points[i].x, saveObject.points[i].y, saveObject.points[i].indice);
+    	this.points.push(img);
+	}
+}
+function criarDataPoints(saveObject){
+	this.dataLinhasPontos = [];
+	for( let i=0;i<saveObject.dataLinhasPontos.length; i++ ){
+		data = saveObject.dataLinhasPontos[i];
+		aux = configParPoint(data.u,data.v,data.peso);
+		this.dataLinhasPontos.push(aux);
 	}
 }
 
