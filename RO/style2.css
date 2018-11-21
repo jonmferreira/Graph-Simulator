@@ -109,6 +109,17 @@
 	background-size: cover;
 	border: 2px solid #000000;
 }
+.div3{
+	
+	background-color: #000000;
+	border-radius: 5px;
+	margin-top: 3.5cm;
+	margin-left: 7cm;
+	background-image: url(img/tela-1-bckg.jpg);
+	background-repeat: no-repeat;
+	background-size: cover;
+	border: 2px solid #000000;
+}
 
 body{
 	background-color: grey;
@@ -154,4 +165,9 @@ body{
 	background-color: white;
 	margin-left:300px;
 	margin-top: 30px;	
+}
+
+.box {
+    display: inline-block;
+    /* o resto permanece igual */
 }

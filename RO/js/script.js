@@ -138,6 +138,7 @@ function criarGrafoChamadas(quantidadeChamadas){
 	}
 	console.log(calls);
 }
+
 class Chamadas{
 	constructor(quantidade){
 		
@@ -359,12 +360,7 @@ function update() {
 		  }
 		  break;
 		case 3:
-			var selection ;
-            do{
-    			selection = parseInt(prompt("Please enter a number from 1 to 1000", "Chamadas"), 10);
-			}while(isNaN(selection) || selection > 1000 || selection < 1);
-			criarGrafoChamadas(selection);
-			etapa.fase = 4;	
+			var formCall = document.getElementById("formCall").visible = "visible";
 			break;
 		default:
 		//console.log("saindo da faixa de fase");
@@ -474,23 +470,19 @@ function connectLine() {
         }
     }
 }
-
 function resetFindParPoint(){
 		this.connection=0;
 		adjPesos = [];
 		peso = '';
 }
-
 function getPoint(id){
 	return points[id-1];
 }
-
 function getPoints (point) {
   
    adjPesos.push(points.indexOf(point)+1);
    this.connection+=1;
 }
-
 function setDataLinhasPontos(){
 	setInputTap(false);
 	makeLine = true;
@@ -514,7 +506,6 @@ function salvarEstagio(){
 	}};
     salvar(JSON.stringify(save));
 }
-
 function salvar(obj) {
 
 		let titulo = "graph";
@@ -546,6 +537,7 @@ function fileSelect(files) {
 		sessionStorage.setItem('graph_simulatorSave', JSON.stringify(saveObject));
 	}
 }
+
 function dataSaved(){
 		var data = sessionStorage.getItem('graph_simulatorSave');
 		sessionStorage.removeItem('graph_simulatorSave');
@@ -556,10 +548,9 @@ function dataSaved(){
 			return true;
 			//setDataLinhasPontos();
 		}
-		else return false;
-		
-		
-	}
+		else return false;		
+}
+
 function criarPontos(saveObject){
 	this.points = [];
 	for( let i=0;i<saveObject.points.length;i++ ){
@@ -577,7 +568,6 @@ function criarDataPoints(saveObject){
 }
 
 //====================== verificações de API
-
 function verificacaoInicial(){
 	// Check for the various File API support.
 	if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -592,7 +582,6 @@ function ajuda(){
 	show = 1;
 	projeto();
 }
-
 function projeto(){
 	if(show ==1){
 		show++;
@@ -609,9 +598,12 @@ function projeto(){
 }
 
 // FUNÇÕES CHAVE DE EXECUÇÃO DO PROJETO
-function atualizarLog(strvalue){
-	document.getElementById("logview").textContent=strvalue;
-}
-function actionOnClick (valor) {
-   atualizarLog("Peso acumulado: "+peso);
+function callMeBaby(){
+	var calls = document.getElementById("quantidadeCall").value;
+	var ondas = document.getElementById("quantidadeOnda").value;
+	quantidade = parseInt( calls );
+	if( quantidade>=1 &&  quantidade<=1000){
+		criarGrafoChamadas(quantidade);
+		etapa.fase = 4;
+	}
 }
