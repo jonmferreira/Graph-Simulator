@@ -122,21 +122,38 @@ class GraphAlgoritms{
 	}
 }
 //Talves essa funcção deva estar dentro de uma classe Redes Oticas//ultima prioridade
-function criarGrafoChamadas(quantidadeChamadas){
+function criarGrafoChamadas(quantidadeChamadas,ondas){
 	grafo = new Grafo(points.length);
 	grafo.setMatrizAdj(dataLinhasPontos);
-	graphAlgoritms= new GraphAlgoritms( grafo );
-
 	calls = Chamadas.gerarChamadas(quantidadeChamadas, points.length);
-	//essa parte de baixo vai parte de executar chamada dentro da função Chamada mesmo
-	for( let i =0;i< calls.quantidade;i++){
-		var u = calls.verificacoes[i].u;
-		var v = calls.verificacoes[i].v;
-		r = graphAlgoritms.menorCaminho( u, v );
-		calls.verificacoes[i].caminho= r.percusso;
-		calls.verificacoes[i].distancia = r.custoPercusso;
-	}
+	calls.realizarVerificoes(grafo);
 	console.log(calls);
+	rd = new RedesOticas(points, dataLinhasPontos, quantidadeChamadas, ondas);
+	console.log(rd);
+	//console.log(rd.enlaces["13"]);console.log(rd.enlaces[13]);
+}
+//== no futuro passar tudo para duas classes
+class RedesOticas{
+	constructor(points, dataLinhasPontos,	quantidade,ondasLim){
+		this.points = points;
+		this.enlaces = {};
+		this.limiteOndas= ondasLim;
+		this.criarEnlaces(dataLinhasPontos);
+	}
+	criarEnlaces(dtLinhaPontos){
+		for(let i =0;i< dtLinhaPontos.length;i++){
+			var enlace= dtLinhaPontos[i];
+			//TODO: tem que ordenar o par
+			this.enlaces[""+enlace.u+""+enlace.v]= ( this.criarEnlance( enlace.u,enlace.v, enlace.peso ) );
+		}
+	}
+	criarEnlance(u,v,peso){
+		return {u:u,v:v,peso:peso,ondaLim:this.limiteOndas,reservado:0}
+	}
+	isEnlaceDisponivel(u,v){
+		var ok= true;
+		for(let i =0;i < this.enlaces.length;i++){}
+	}
 }
 
 class Chamadas{
@@ -146,7 +163,7 @@ class Chamadas{
     	this.buscas = [];
     	this.verificacoes = [];
 	}
-	alocar_chamada(u,v){
+	getIndexChamada(u,v){
     	var disponivel= -1;
     	for (var i=0; i< this.buscas.length && disponivel== -1 ;i++){
     		if( this.buscas[i].par == ""+u+"-"+v  || this.buscas[i].par == ""+v+"-"+u){
@@ -155,60 +172,52 @@ class Chamadas{
     	}
     	return disponivel;
     }
-    addChamda(){
-
+    realizarVerificoes( grafo ){
+    	var graphAlgoritms = new GraphAlgoritms( grafo );
+    	for( let i =0;i < this.quantidade;i++){
+			var u = this.verificacoes[i].u;
+			var v = this.verificacoes[i].v;
+			var r = graphAlgoritms.menorCaminho( u, v );
+			this.verificacoes[i].setData( r.percusso, r.custoPercusso);
+			let indiceCall =  this.getIndexChamada(u,v);
+			this.buscas[indiceCall].addCaminho( r.percusso, r.custoPercusso);
+		}
+		return this.verificacoes;
     }
-    addVerificacao(){
-
-    }
-    realizarVerificoes(){
-
-    }
-    static gerarChamadas(quantidade, totalPontos){
-	
-    var chamadas = new Chamadas(quantidade);
-
-	for(var i=1;i<=quantidade;i++ ){
-		var u = getRandomInt(1, totalPontos);
-		var v = getRandomInt(1, totalPontos);
+    static gerarRandomPar(limite){
+		var u = getRandomInt(1, limite);
+		var v = getRandomInt(1, limite);
 		while (u==v){
-			var v = getRandomInt(1, totalPontos);
+			var v = getRandomInt(1, limite);
 		}
 		if (u>v){
 			var t =u; u=v; v=t;
 		}
-		let j = chamadas.alocar_chamada(u,v);
-		if( j == -1){
-			var chamada = new BuscaChamada(u,v);
-			chamadas.buscas.push(chamada);
-		}
-		else {
-			chamadas.buscas[j].solicitacao ++;
-		}
+		return {u:u,v:v};
+    }
+    static gerarChamadas(quantidade, totalPontos){
+	
+	    var chamadas = new Chamadas(quantidade);
+		for(var i=1;i<=quantidade;i++ ){
+			var par = Chamadas.gerarRandomPar(totalPontos);
+			var u = par.u;
+			var v = par.v;
+			let j = chamadas.getIndexChamada(u,v);
+			if( j == -1){
+				var chamada = new BuscaChamada(u,v);
+				chamadas.buscas.push(chamada);
+			}
+			else {
+				chamadas.buscas[j].solicitacao ++;
+			}
 
-		var verificacao = new VerificacaoChamada(u,v);
-		chamadas.verificacoes.push(verificacao);
+			var verificacao = new VerificacaoChamada(u,v);
+			chamadas.verificacoes.push(verificacao);
+		}
+		return chamadas;
 	}
-	return chamadas;
-}
     // criar function static de gerarChamadas
 }
-
-
-class VerificacaoChamada{
-	constructor(u,v){
-		this.par=""+u+"-"+v,
-		this.u = u;
-		this.v = v;
-		this.caminho = "";
-		this.distancia=-1;
-	}
-	setData(caminho,distancia){
-		this.caminho = caminho;
-		this.distancia = distancia;
-	}
-}
-
 class BuscaChamada{
 	constructor(u,v){
 		this.par=""+u+"-"+v,
@@ -227,8 +236,24 @@ class BuscaChamada{
 		}
 		return buscado;
 	}
+	addCaminho(rota,distancia){
+		var caminho = new Caminho(rota,distancia);
+		this.caminhos.push(caminho);
+	}
 }
-
+class VerificacaoChamada{
+	constructor(u,v){
+		this.par=""+u+"-"+v,
+		this.u = u;
+		this.v = v;
+		this.caminho = "";
+		this.distancia=-1;
+	}
+	setData(caminho,distancia){
+		this.caminho = caminho;
+		this.distancia = distancia;
+	}
+}
 class Caminho{
 	constructor(rota,distancia){
 		this.rota = rota;
@@ -244,13 +269,7 @@ function getRandomInt(min, max) {
 	max = Math.floor(max);
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-//== no futuro passar tudo para duas classes
-class RedesOticas{
-	constructor(points, rotas){
-		this.points = points;
-		this.rotas = rotas;
-	}
-}
+
 
 //================== Logica do phaser		
 
@@ -305,19 +324,6 @@ function create() {
 	game.input.onTap.add(onTapHandler, this);
 	
 }
-
-function getStart(){
-	etapa.fase=1;
-	setInputTap(true);
-	game.paused = false;
-}
-
-function setInputTap(pode){
-	currentPoint.visible= pode;
-	currentPoint.inputEnabled = pode;
-	overTap= !pode;
-}
-
 function update() {
     
     switch ( etapa.fase ){
@@ -360,13 +366,12 @@ function update() {
 		  }
 		  break;
 		case 3:
-			var formCall = document.getElementById("formCall").visible = "visible";
+			var formCall = document.getElementById("formCall").style.visibility = "visible";
 			break;
 		default:
 		//console.log("saindo da faixa de fase");
 	}
 }
-
 function render(){
 	//adiciona indicie a bolinha
     var index=1;
@@ -376,7 +381,6 @@ function render(){
     });
     exibirLinhas();
 }
-
 function exibirLinhas(){
 	if(makeLine){
 
@@ -415,7 +419,6 @@ function createImg(x,y, id){
         img.indice = id;
      return img;
 }
-
 function inicarParPoint(){
 	var aux = {
 				u:0,
@@ -433,7 +436,6 @@ function inicarParPoint(){
 			};
 	return  aux;
 }
-
 function configParPoint(idP1,idP2, peso){
 	var aux = inicarParPoint();
 	aux.u = idP1;
@@ -488,6 +490,16 @@ function setDataLinhasPontos(){
 	makeLine = true;
 	etapa.fase = 3;
 	game.paused = false;
+}
+function getStart(){
+	etapa.fase++;
+	setInputTap(true);
+	game.paused = false;
+}
+function setInputTap(pode){
+	currentPoint.visible= pode;
+	currentPoint.inputEnabled = pode;
+	overTap= !pode;
 }
 
 //==================== Salvar layout
@@ -603,7 +615,7 @@ function callMeBaby(){
 	var ondas = document.getElementById("quantidadeOnda").value;
 	quantidade = parseInt( calls );
 	if( quantidade>=1 &&  quantidade<=1000){
-		criarGrafoChamadas(quantidade);
+		criarGrafoChamadas(quantidade,ondas);
 		etapa.fase = 4;
 	}
 }
