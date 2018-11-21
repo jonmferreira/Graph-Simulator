@@ -1,0 +1,91 @@
+.btn {
+		background-color: inherit;
+		padding: 14px 28px;
+		font-size: 16px;
+		cursor: pointer;
+		display: inline-block;
+		border: 1px solid black;
+		border-radius: 5px;
+		background-color: white;
+	}
+
+	/* Green */
+.success {
+	color: green;
+}
+
+.success:hover {
+	background-color: #4CAF50;
+	color: white;
+}
+
+/* Blue */
+.info {
+	color: dodgerblue;
+}
+
+.info:hover {
+	background: #2196F3;
+	color: white;
+}
+
+	/* Orange */
+.warning {
+	color: orange;
+}
+
+.warning:hover {
+	background: #ff9800;
+	color: white;
+}
+
+	/* Red */
+.danger {
+	color: red;
+}
+
+.danger:hover {
+	background: #f44336;
+	color: white;
+}
+
+/* Gray */
+.default {
+	color: black;
+}
+
+.default:hover {
+	background: #e7e7e7;
+}
+
+html, body{
+	min-height: 100%
+}
+
+body {
+	background-image: url(img/tela-1-bckg.jpg);
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+h1,h3{
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bolder;
+	text-align: center;
+}
+
+.botoes {
+	text-align: center;
+	padding-top: 5cm;
+}
+
+
+.imgagem-1, .imagem-2{
+	position: absolute;
+    margin-left:150px;
+    margin-top:10px;
+}
+
+
+

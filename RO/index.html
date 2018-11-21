@@ -1,96 +1,25 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Simulação</title>
-    <script src="js/phaser.min.js"></script>
-    <script src="js/script.js"></script>
-
-	<script type="text/javascript" src="js/FileSaver.min.js"></script>
+	<meta charset="UTF-8">
     <link rel="stylesheet" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-	<style>
-	.btn {
-		border: none;
-		background-color: inherit;
-		padding: 14px 28px;
-		font-size: 16px;
-		cursor: pointer;
-		display: inline-block;
-	}
-
-	/* Green */
-	.success {
-		color: green;
-	}
-
-	.success:hover {
-		background-color: #4CAF50;
-		color: white;
-	}
-
-	/* Blue */
-	.info {
-		color: dodgerblue;
-	}
-
-	.info:hover {
-		background: #2196F3;
-		color: white;
-	}
-
-	/* Orange */
-	.warning {
-		color: orange;
-	}
-
-	.warning:hover {
-		background: #ff9800;
-		color: white;
-	}
-
-	/* Red */
-	.danger {
-		color: red;
-	}
-
-	.danger:hover {
-		background: #f44336;
-		color: white;
-	}
-
-	/* Gray */
-	.default {
-		color: black;
-	}
-
-	.default:hover {
-		background: #e7e7e7;
-	}
-	p {
-		border: 1px solid black;
-		border-radius: 5px;
-		width: 400px;
-		height: 400px;
-		background: skyblue;
-		padding-left: 1cm;
-		padding-top: 1cm;
-	}
-	
-	</style>
+	<link rel="stylesheet" type="text/css" href="style2.css">
+	<title>PAGINA DE TESTE</title>
 </head>
-<body onmousemove="projeto()" >
-	<div>
-		<h2>Simulador versão 2</h2>
-		<input type="file" id="files" onchange="fileSelect(this.files)" />
-		<button class="btn info">Buscar grafo salvo</button>
-		<button class="btn success" onclick="getStart()">Próxima etapa</button>
-		<button class="btn danger" onclick="ajuda()">Ajuda</button>
+<body>
+
+
+	<div class="div1">
+		<h1>BEM VINDO AO SIMULADOR DE GRAFOS</h1>
 	</div>
-	<div id="phaser-id"></div>
-	<div> 
-	<label>LOG::</label>
-	<p id="logview" >Comece clicando na tela</p>
+	
+	<div class="div2">
+		<div class="botoes">
+			<button class="btn success" onclick=location.href="simulador.html">INICAR NOVO</button>
+			<button class="btn info" onclick=location.href="grafo_salvo.html">USAR GRAFO SALVO</button>
+			<button class="btn danger" onclick=location.href="sobre.html">SOBRE</button>
+		</div>
 	</div>
 </body>
 </html>

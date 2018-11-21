@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulação</title>
+    <script src="js/phaser.min.js"></script>
+    <script src="js/script.js"></script>
+
+	<script type="text/javascript" src="js/FileSaver.min.js"></script>
+    <link rel="stylesheet" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body onmousemove="projeto()" >
+
+	<header>
+		<h1>Simulador de Grafos</h1>
+	</header>
+
+	 <div class="row">
+  		<div class="column-1">
+  			<input type="file" id="files" onchange="fileSelect(this.files)" />
+			<button class="btn info">Buscar grafo salvo</button>
+			<button class="btn success" onclick="getStart()">Próxima etapa</button>
+			<button class="btn danger" onclick="ajuda()">Ajuda</button>
+			<div id="phaser-id"></div>
+  		</div>
+  		<div class="column-2">
+  			<p>LOG: </p>
+			<p id="logview"></p>
+  		</div>
+	</div> 
+
+
+	<div class="footer">
+  		<p>Desenvolvido por alunos da UEA/EST</p>
+	</div>
+
+</body>
+</html>

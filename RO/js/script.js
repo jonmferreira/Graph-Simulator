@@ -135,9 +135,6 @@ function criarGrafoChamadas(quantidadeChamadas){
 	}
 	console.log(calls);
 }
-
-
-
 class Chamadas{
 	constructor(quantidade){
 		
@@ -252,7 +249,7 @@ class RedesOticas{
 }
 
 //================== Logica do phaser		
-var game = new Phaser.Game(600, 400, Phaser.CANVAS, 'phaser-id',
+var game = new Phaser.Game(1011, 460, Phaser.CANVAS, 'phaser-id',
  { preload: preload, create: create, update: update, render:render});
 
 function preload() {
