@@ -174,3 +174,25 @@ body{
 #formCall{
 	visibility: hidden;
 }
+
+
+.div1 .success{
+	margin-top: 3cm;
+	margin-left: 2.5cm;
+}
+
+.div1 .info{
+	margin-top: 2cm;
+	margin-left: 2cm;
+}
+
+
+.chamadas{
+	background-color: white;
+	border: 1px solid black;
+	border-radius: 5px;
+	margin-top: 2cm;
+	margin-left: 0.5cm;
+	padding: 1cm;
+	z-index: 3;
+}

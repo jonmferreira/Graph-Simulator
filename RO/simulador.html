@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Simulação</title>
+    <title>SIMULADOR DE GRAFO</title>
    
 	<script type="text/javascript" src="js/FileSaver.min.js"></script>
     <link rel="stylesheet" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -16,14 +16,13 @@
 
 	<div class="div1">
 		<h1>BEM VINDO AO SIMULADOR DE GRAFOS</h1>
-		<button class="btn success" onclick="getStart()">Próxima etapa</button>
-		<button class="btn danger" onclick="ajuda()">Ajuda</button>
-	</div>
-
-	<div class="div2">
-		<div id="phaser-id" class="box"></div>
+		<button class="btn success" onclick="getStart()">INICIAR</button>
+		<br>
+		<button class="btn info" onclick="ajuda()">PROXIMA ETAPA</button>
+		<br>
+		<!-- <button class="btn danger" onclick="ajuda()">AJUDA</button> -->	
 		<div id="formCall" class="box" >
-			<div >
+			<div class="chamadas">
 			  Quantidade de chamadas:<br>
 			  <input type="text" id="quantidadeCall" value="1000"><br>
 			  Last name:<br>
@@ -31,6 +30,14 @@
 			  <button onclick="callMeBaby()">Simular</button>
 			</div>	
 		</div>
+
+	</div>
+
+	<div class="div2">
+		<div id="phaser-id" class="box">
+			
+		</div>
+		
 	</div>
 </body>
 </html>

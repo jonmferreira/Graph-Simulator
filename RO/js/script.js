@@ -316,7 +316,7 @@ function create() {
 		color: "YELLOWGREEN",
         align: "center"
 	} ;
-	game.stage.backgroundColor = '#191970';
+	game.stage.backgroundColor = '#808080';
 	config_buttons();
 	currentPoint = game.add.image(10, 10, 'centroid');
 	currentPoint.anchor.set(0.5);
