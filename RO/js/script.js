@@ -47,13 +47,11 @@ class GraphAlgoritms{
 		this.infinito = grafo.Infinito();
 		this.graph = grafo;
 	}
-
 	menorCaminho(origem,destino){
 		
 		var saida =  this.menorCaminho_init(origem,destino);
 		return saida;
 	}
-	
 	menorCaminho_init(origem,destino){
 		this.saida = [];
 		this.caminho = [];
@@ -83,7 +81,6 @@ class GraphAlgoritms{
 		
 		return str_saida;
 	}
-
 	menorCaminho_loop(u,fim,distancias,conj,visitados){
 		var u=  conj.pop();
 
@@ -108,7 +105,6 @@ class GraphAlgoritms{
 			}
 		}
 	}
-
 	atualizarCaminho(v,fim){
 		this.caminho.push(v+1);
 		if ( this.caminho[this.caminho.length-1] == fim){
@@ -134,7 +130,7 @@ function criarGrafoChamadas(quantidadeChamadas,ondas){
 }
 //== no futuro passar tudo para duas classes
 class RedesOticas{
-	constructor(points, dataLinhasPontos,	quantidade,ondasLim){
+	constructor(points, dataLinhasPontos, quantidade,ondasLim){
 		this.points = points;
 		this.enlaces = {};
 		this.limiteOndas= ondasLim;
@@ -148,11 +144,62 @@ class RedesOticas{
 		}
 	}
 	criarEnlance(u,v,peso){
-		return {u:u,v:v,peso:peso,ondaLim:this.limiteOndas,reservado:0}
+		var ondas = [];
+		for( let i=1;i<= this.limiteOndas; i++){
+			var onda = { onda:"y"+i,
+						 tempoReserva:0,
+						 isReservado:function(){
+						 	return tempoReserva !=0;
+						 },
+						 updateReserva: function(tempoDecorrido){
+						 	this.tempoReserva -= tempoDecorrido;
+				 			if( this.tempoReserva < 0 ) {
+				 				this.tempoReserva = 0;
+				 			}
+						 },
+						 reservar: function(tempo){
+						 	this.tempoReserva = tempo;
+						 }
+						};
+			ondas.push(onda);
+		}
+		return { u:u,
+				 v:v,
+				 peso:peso,
+				 ondasReservadas: ondas,
+				 atualizaReserva: function(tempoDecorrido){//testar isso aqui usando foreach
+				 	for(let i =0; i < this.ondasReservadas.length; i++){
+				 		this.ondasReservadas[i].updateReserva( tempoDecorrido) ;
+				 	}
+				 },
+				 atualizaReserva2: function(tempoDecorrido){//testar isso aqui usando foreach
+				 	ondasReservadas.foreach(
+				 		function(element, index, array){
+				 			element.updateReserva( tempoDecorrido) ;
+				 		} );
+				 		
+				 },
+				 isOndaDisponivel: function(onda){
+				 	return this.ondasReservadas[onda].isReservado();
+				 },
+				 reservar: function(onda,tempo){
+				 	this.ondasReservadas[onda].reservar(tempo);
+				 }
+				};
 	}
-	isEnlaceDisponivel(u,v){
-		var ok= true;
-		for(let i =0;i < this.enlaces.length;i++){}
+	isEnlaceDisponivel(u,v, onda){
+		var is= true;
+		var cod = ""u+""+v;
+		if( this.enlaces[ cod ] != null ){
+			is = this.enlaces[ cod ].isOndaDisponivel(onda);
+		}else{
+			is = false;
+		}
+		return is;
+	}
+	reservarEnlace(u,v,onda,tempo){
+		var cod = ""u+""+v;
+		this.enlaces[ cod ].reservar(onda,tempo);
 	}
 }
 
