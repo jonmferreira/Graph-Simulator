@@ -2,18 +2,23 @@
 var game = new Phaser.Game(900, 500, Phaser.CANVAS, 'phaser-id',
  { preload: preload, create: create, update: update, render:render});
 // usando objetos ele altera valor do atributo
-asas={x:2};
-function as(ass){
-	ass.x= 1;
+class A{
+	constructor(an){
+		this.an= an;
+		this.an.a = '1';
+	}
 }
-as(asas);
-console.log(asas);
+var as = {a:0};
+af = new A(as);
+console.log(as);
+
 //========== teste acima
 class Grafo{
 	
 	constructor(quantidadePoints){
 		this.infinito = Number.MAX_SAFE_INTEGER;
 		this.lengthVertices = quantidadePoints;
+		this.enlaces = {};
 		this.inicializarGrafo();
 	}
 	Infinito(){
@@ -29,16 +34,91 @@ class Grafo{
 	        }
     	}
 	}
-	setMatrizAdj(dataLinhasPontos){
+	setConfigInit(dataLinhasPontos, limiteOndas){
+		this.limiteOndas= limiteOndas;
 		for( let k=0; k < dataLinhasPontos.length; k++ ){
-	        for( let i=0; i< this.lengthVertices; i++ ){
-	            if( (dataLinhasPontos[k].u-1) == i){
-	            	let v = dataLinhasPontos[k].v-1;
-	                this.matrizADJ[i][ v ] =parseInt(dataLinhasPontos[k].peso);
-	                this.matrizADJ[ v ][i] =parseInt(dataLinhasPontos[k].peso);
-	            }
-	        }
-    	}
+			this.setMatrizAdj( dataLinhasPontos[k] );
+			this.criarEnlaces( dataLinhasPontos[k] );
+		}
+	}
+	setMatrizAdj(dataLinhaPontos){
+		var u = dataLinhaPontos.u -1;
+		var v = dataLinhaPontos.v -1;
+		var peso  = dataLinhaPontos.peso;
+		this.matrizADJ[ u ][ v ] =parseInt( peso );
+	    this.matrizADJ[ v ][ u ] =parseInt( peso );
+	}
+	criarEnlaces( enlace ){
+		var u = enlace.u;
+		var v = enlace.v;
+		if (u> v){
+			var t =u;u=v;v=t; 
+		}
+		this.enlaces[Grafo.toParCode(u,v)]= ( this.criarEnlance( u, v, enlace.peso ) );
+	}
+	criarEnlance(u,v,peso){
+		var ondas = [];
+		for( let i=1;i<= this.limiteOndas; i++){
+			var onda = { onda:"y"+i,
+						 tempoReserva:0,
+						 isReservado:function(){
+						 	return tempoReserva !=0;
+						 },
+						 updateReserva: function(tempoDecorrido){
+						 	this.tempoReserva -= tempoDecorrido;
+				 			if( this.tempoReserva < 0 ) {
+				 				this.tempoReserva = 0;
+				 			}
+						 },
+						 reservar: function(tempo){
+						 	this.tempoReserva = tempo;
+						 }
+						};
+			ondas.push(onda);
+		}
+		return { u:u,
+				 v:v,
+				 peso:peso,
+				 ondasReservadas: ondas,
+				 atualizaReserva: function(tempoDecorrido){//testar isso aqui usando foreach
+				 	for(let i =0; i < this.ondasReservadas.length; i++){
+				 		this.ondasReservadas[i].updateReserva( tempoDecorrido) ;
+				 	}
+				 },
+				 atualizaReserva2: function(tempoDecorrido){//testar isso aqui usando foreach
+				 	ondasReservadas.foreach(
+				 		function(element, index, array){
+				 			element.updateReserva( tempoDecorrido) ;
+				 		} );
+				 		
+				 },
+				 isOndaDisponivel: function(onda){
+				 	return this.ondasReservadas[onda].isReservado();
+				 },
+				 reservar: function(onda,tempo){
+				 	this.ondasReservadas[onda].reservar(tempo);
+				 }
+				};
+	}
+	isEnlaceDisponivel(u,v, onda){
+		var is= true;
+		var cod = Grafo.toParCode(u,v);
+		if( this.enlaces[ cod ] != null ){
+			is = this.enlaces[ cod ].isOndaDisponivel(onda);
+		}else{
+			is = false;
+		}
+		return is;
+	}
+	reservarEnlace(u,v,onda,tempo){
+		var cod = Grafo.toParCode(u,v);
+		this.enlaces[ cod ].reservar(onda,tempo);
+	}
+	static toParCode(u,v){
+		if (u>v){
+			var t =u; u=v; v=t;
+		}
+		return ""+u+""+v;
 	}
 }
 //criar funcao de menor caminho otico
@@ -105,6 +185,11 @@ class GraphAlgoritms{
 			}
 		}
 	}
+	//TODO
+	isEnlaceDisponivel(onda_y){
+
+	}
+
 	atualizarCaminho(v,fim){
 		this.caminho.push(v+1);
 		if ( this.caminho[this.caminho.length-1] == fim){
@@ -119,101 +204,41 @@ class GraphAlgoritms{
 }
 //Talves essa funcção deva estar dentro de uma classe Redes Oticas//ultima prioridade
 function criarGrafoChamadas(quantidadeChamadas,ondas){
-	grafo = new Grafo(points.length);
-	grafo.setMatrizAdj(dataLinhasPontos);
-	calls = Chamadas.gerarChamadas(quantidadeChamadas, points.length);
-	calls.realizarVerificoes(grafo);
-	console.log(calls);
 	rd = new RedesOticas(points, dataLinhasPontos, quantidadeChamadas, ondas);
 	console.log(rd);
-	//console.log(rd.enlaces["13"]);console.log(rd.enlaces[13]);
+	console.log("simulando cenario de RD");
+	console.log(rd.simularCenario());
 }
 //== no futuro passar tudo para duas classes
 class RedesOticas{
 	constructor(points, dataLinhasPontos, quantidade,ondasLim){
 		this.points = points;
-		this.enlaces = {};
 		this.limiteOndas= ondasLim;
-		this.criarEnlaces(dataLinhasPontos);
+		this.dataLinhasPontos = dataLinhasPontos;
+		this.quantidadeChamadas = quantidade;
+		this.calls = {};
 	}
-	criarEnlaces(dtLinhaPontos){
-		for(let i =0;i< dtLinhaPontos.length;i++){
-			var enlace= dtLinhaPontos[i];
-			//TODO: tem que ordenar o par
-			this.enlaces[""+enlace.u+""+enlace.v]= ( this.criarEnlance( enlace.u,enlace.v, enlace.peso ) );
-		}
+	simularCenario(){
+		this.grafoOtico = new Grafo(this.points.length);
+		this.grafoOtico.setConfigInit(this.dataLinhasPontos, this.limiteOndas );
+		this.calls = Chamadas.gerarChamadas(this.quantidadeChamadas, this.points.length);
+		this.calls.realizarVerificoes( this.grafoOtico );
+		return this.calls;
 	}
-	criarEnlance(u,v,peso){
-		var ondas = [];
-		for( let i=1;i<= this.limiteOndas; i++){
-			var onda = { onda:"y"+i,
-						 tempoReserva:0,
-						 isReservado:function(){
-						 	return tempoReserva !=0;
-						 },
-						 updateReserva: function(tempoDecorrido){
-						 	this.tempoReserva -= tempoDecorrido;
-				 			if( this.tempoReserva < 0 ) {
-				 				this.tempoReserva = 0;
-				 			}
-						 },
-						 reservar: function(tempo){
-						 	this.tempoReserva = tempo;
-						 }
-						};
-			ondas.push(onda);
-		}
-		return { u:u,
-				 v:v,
-				 peso:peso,
-				 ondasReservadas: ondas,
-				 atualizaReserva: function(tempoDecorrido){//testar isso aqui usando foreach
-				 	for(let i =0; i < this.ondasReservadas.length; i++){
-				 		this.ondasReservadas[i].updateReserva( tempoDecorrido) ;
-				 	}
-				 },
-				 atualizaReserva2: function(tempoDecorrido){//testar isso aqui usando foreach
-				 	ondasReservadas.foreach(
-				 		function(element, index, array){
-				 			element.updateReserva( tempoDecorrido) ;
-				 		} );
-				 		
-				 },
-				 isOndaDisponivel: function(onda){
-				 	return this.ondasReservadas[onda].isReservado();
-				 },
-				 reservar: function(onda,tempo){
-				 	this.ondasReservadas[onda].reservar(tempo);
-				 }
-				};
-	}
-	isEnlaceDisponivel(u,v, onda){
-		var is= true;
-		var cod = ""u+""+v;
-		if( this.enlaces[ cod ] != null ){
-			is = this.enlaces[ cod ].isOndaDisponivel(onda);
-		}else{
-			is = false;
-		}
-		return is;
-	}
-	reservarEnlace(u,v,onda,tempo){
-		var cod = ""u+""+v;
-		this.enlaces[ cod ].reservar(onda,tempo);
-	}
+	
 }
 
 class Chamadas{
 	constructor(quantidade){
-		
     	this.quantidade = quantidade;
     	this.buscas = [];
     	this.verificacoes = [];
 	}
 	getIndexChamada(u,v){
     	var disponivel= -1;
+    	var code = Grafo.toParCode(u,v);
     	for (var i=0; i< this.buscas.length && disponivel== -1 ;i++){
-    		if( this.buscas[i].par == ""+u+"-"+v  || this.buscas[i].par == ""+v+"-"+u){
+    		if( this.buscas[i].par == code ){
     			disponivel= i;
     		}
     	}
@@ -222,15 +247,25 @@ class Chamadas{
     realizarVerificoes( grafo ){
     	var graphAlgoritms = new GraphAlgoritms( grafo );
     	for( let i =0;i < this.quantidade;i++){
+
 			var u = this.verificacoes[i].u;
 			var v = this.verificacoes[i].v;
+			if (i != 0){
+				//TODO: se não for primeiro, CALCULA TEMPO DE PROXIMA CHAMADA
+				//TODO: atualiza todos enlances;
+			}
 			var r = graphAlgoritms.menorCaminho( u, v );
+			//TODO: calcular aqui o tempo de chamada
+			//TODO: reservar aqui cada enlace do caminho na onda y com tempo tal
+			//TODO: Isso se o retorno não retornou bloqueio ne.
 			this.verificacoes[i].setData( r.percusso, r.custoPercusso);
 			let indiceCall =  this.getIndexChamada(u,v);
+			//adicionar na busca o tempo alocado
 			this.buscas[indiceCall].addCaminho( r.percusso, r.custoPercusso);
 		}
 		return this.verificacoes;
     }
+    //TODO:CRIAR AQUI o tempo RANDOM
     static gerarRandomPar(limite){
 		var u = getRandomInt(1, limite);
 		var v = getRandomInt(1, limite);
