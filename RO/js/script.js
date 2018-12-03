@@ -1,5 +1,5 @@
 ﻿//================== Logica do phaser		
-var game = new Phaser.Game(900, 500, Phaser.CANVAS, 'phaser-id',
+var game = new Phaser.Game(900, 411, Phaser.CANVAS, 'phaser-id',
  { preload: preload, create: create, update: update, render:render});
 // usando objetos ele altera valor do atributo
 asas={x:2};

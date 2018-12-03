@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
     <link rel="stylesheet" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="style2.css">
+	<link rel="stylesheet" type="text/css" href="style3.css">
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	<script src="js/saveGraph.js"></script>
 	<title>SIMULADOR DE GRAFO - GRAFO SALVO</title>
@@ -12,33 +12,49 @@
 <body>
 
 	<div class="div1">
-		<h1>SIMULADOR DE GRAFOS</h1>
-		<h3>SELECIONE UM DOS MODELOS ABAIXO OU CARREGUE SEU PROPRIO GRAFO SALVO</h3>	
+
 	</div>
 
 	<div class="div2">
-		<div class="w3-row w3">
-  		<div class="w3-container w3-half w3">
-   			<div class="imagem-1">
-				<a href="pagina_teste.html">
-					<img src="img/model_graph1.png">
-					<br>
-					<button class="btn success" onclick="">GRAFO A</button>
-				</a>
+		<div class="header">
+			<div 	 class="header-right">
+				<p>SIMULADOR DE GRAFOS</p>
 			</div>
-  		</div>
+		</div> 
+		
+		<h3>SELECIONE UM DOS MODELOS ABAIXO OU CARREGUE SEU PROPRIO GRAFO SALVO</h3>	
 
-  		<div class="w3-container w3-half">
-		    <div class="imagem-2">
-			<a href="pagina_teste.html">
-				<img src="img/model_graph2.png">
-				<br>
-				<button class="btn success" onclick="">GRAFO B</button>
-			</a>
-			</div>
-  		</div>
+		<div class="w3-row w3">
+  			<div class="w3-container w3-half w3">
+   				<div class="imagem-1">
+					<a href="pagina_teste.html">
+						<img src="img/model_graph1.png">
+						<br>
+						<button class="btn success" onclick="">GRAFO A</button>
+					</a>
+				</div>
+  			</div>
+
+  			<div class="w3-container w3-half">
+		    	<div class="imagem-2">
+				<a href="pagina_teste.html">
+					<img src="img/model_graph2.png">
+					<br>
+					<button class="btn success" onclick="">GRAFO B</button>
+				</a>
+				</div>
+  			</div>
+		</div>
+		
+		<div class="carrega">
+			<input type="file" id="files" onchange="fileSelect(this.files)" />
+		</div>
 	</div>
-		<input type="file" id="files" onchange="fileSelect(this.files)" />
+
+	<div class="div3">
+		<div class="botoes">
+			<button class="btn success" onclick=location.href="index.html">INICIO</button>
+		</div>
 	</div>
 
 	

@@ -86,6 +86,44 @@
 	border: 2px solid #000000;
 }
 
+.div2 h3{
+	font-family: Arial, Helvetica, sans-serif;
+	margin-left: 5px;
+	text-align: center;
+	font-size: 15px;
+}
+
+.div2 h2{
+	font-family: Arial, Helvetica, sans-serif;
+	margin-left: 5px;
+	text-align: center;
+}
+
+
+.div2 p{
+	font-family: Arial, Helvetica, sans-serif;
+	margin-left: 5px;
+}
+
+.div2 ul{
+	font-family: Arial, Helvetica, sans-serif;
+	margin-left: 30px;
+}
+
+.infos p{
+	font-family: Arial, Helvetica, sans-serif;
+	margin-left: 30px;
+	text-align: center;
+}
+
+.div2 a{
+	text-align: center;
+	font-family: Arial, Helvetica, sans-serif;
+	margin-left: 40px;	
+	margin-bottom: 1cm;
+}
+
+
 .div3{
 	position: absolute;
 	background-color: #B6DBC9;
@@ -117,8 +155,30 @@
   text-align: center;
   padding: 12px;
   text-decoration: none;
-  font-size: 18px;
+  font-size: 25px;
   line-height: 25px;
   border-radius: 4px;
   font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.imagem-1{
+	margin-left: 1cm;
+}
+
+.imagem-1 button{
+	margin-left: 50px;
+}
+
+.imagem-2{
+	margin-left: 1cm;
+}
+
+.imagem-2 button{
+	margin-left: 50px;
+}
+
+.carrega{
+	margin-top: 1cm;
+	margin-left: 8.5cm;
 }
