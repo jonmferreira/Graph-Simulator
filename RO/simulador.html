@@ -1,55 +1,101 @@
-		<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <meta name="description" content="Ela Admin - HTML5 Admin Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- <link rel="apple-touch-icon" href="https://i.imgur.com/QRAUqs9.png">
+    <link rel="shortcut icon" href="https://i.imgur.com/QRAUqs9.png"> -->
+
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.min.css"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pixeden-stroke-7-icon@1.2.3/pe-icon-7-stroke/dist/pe-icon-7-stroke.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.0/css/flag-icon.min.css">
+    <!-- <link rel="stylesheet" href="assets/css/cs-skin-elastic.css"> -->
+    <!-- <link rel="stylesheet" href="assets/css/style.css"> -->
+
+    <!-- <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'> -->
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+
     <meta charset="UTF-8">
     <title>SIMULADOR DE GRAFO</title>
-   
-	<script type="text/javascript" src="js/FileSaver.min.js"></script>
+
+    <script type="text/javascript" src="js/FileSaver.min.js"></script>
     <link rel="stylesheet" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="style3.css">
-	<script src="js/phaser.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style3.css">
+    <script src="js/phaser.min.js"></script>
     <script src="js/script.js"></script>
+
 </head>
+<body onmousemove="projeto()">
 
-<body onmousemove="projeto()" >
+  <div class="div1"></div>
 
-	<div class="div1">
-		
-	</div>
+  <div class="div2">
+    <div class="header">
+      <div class="header-right">
+        <p>SIMULADOR DE GRAFOS</p>
+      </div>
+      <!-- DIV DO PHASER CANVAS ABAIXO, FALTA AJUSTAR -->
+      <div id="phaser-id" class="box"></div>
+    </div>
 
-	<div class="div2">
-		<div class="header">
-			<div class="header-right">
-				<p>SIMULADOR DE GRAFOS</p>
-			</div>
-		</div> 
+  </div>
 
-		<div id="phaser-id" class="box"></div>
-	</div>
-
-	<div class="div3">
-		<div class="botoes">
-			<button class="btn success" onclick="getStart()">INICIAR</button>
-			<button class="btn info" onclick="ajuda()">PROXIMA ETAPA</button>
-			<!-- <button class="btn danger" onclick="ajuda()">AJUDA</button> -->	
-			<button class="btn danger" onclick=location.href="index.html">RETORNAR</button>
-		</div>
-		
-		<!-- DIV PARA AS CHAMADAS, POP UP -->		
-		<div id="formCall" class="box" >
-			<div class="chamadas">
-			  Quantidade de chamadas:<br>
-			  <input type="text" id="quantidadeCall" value="1000"><br>
-			  Last name:<br>
-			  <input type="text" id="quantidadeOnda" value="3"><br><br>
-			  <button onclick="callMeBaby()">Simular</button>
-			</div>	
-		</div>	
+  <div class="div3">
+    <div class="botoes">
+      <button class="btn success" onclick="getStart()">INICIAR</button>
+      <button class="btn info" onclick="ajuda()">PROXIMA ETAPA</button>
+      <!-- <button class="btn danger" onclick="ajuda()">AJUDA</button> -->
+      <button type="button" class="btn success" data-toggle="modal" data-target="#largeModal">CHAMADAS</button>
+      <button class="btn danger" onclick=location.href="index.html">RETORNAR</button>
+    </div>
 
 
-	</div>
+  </div>
+            <div class="modal fade" id="largeModal" tabindex="-1" role="dialog" aria-labelledby="largeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="largeModalLabel">Calculo das chamadas</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                          <!-- DIV PARA AS CHAMADAS, POP UP -->
+                          <div id="formCall" class="box" >
+                            <div class="chamadas">
+                              Quantidade de chamadas:<br>
+                              <input type="text" id="quantidadeCall" value="1000"><br>
+                              Quantidade de nós:<br>
+                              <input type="text" id="quantidadeOnda" value="3"><br><br>
+                              <button onclick="callMeBaby()">Simular</button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn danger" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn success">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-		
+<div class="clearfix"></div>
+
+
+<!-- Right Panel -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@2.2.4/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.4/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-match-height@0.7.2/dist/jquery.matchHeight.min.js"></script>
+<script src="assets/js/main.js"></script>
+
+
 </body>
 </html>
