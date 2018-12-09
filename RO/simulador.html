@@ -27,7 +27,9 @@
     <link rel="stylesheet" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
     <link rel="stylesheet" type="text/css" href="style3.css">
+    <link rel="stylesheet" type="text/css" href="table_custom.css">
     <script src="js/phaser.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="js/script.js"></script>
 
 </head>
@@ -45,7 +47,6 @@
     </div>
 
   </div>
-
   <div class="div3">
     <div class="botoes">
       <button class="btn success" onclick="getStart()">INICIAR</button>
@@ -55,7 +56,16 @@
       <button class="btn danger" onclick=location.href="index.html">RETORNAR</button>
     </div>
 
-
+    <div class="container" id = "charts">
+      <div id ="chart_cell" style=" margin: 64px;">
+         <div id="chart_poisson" style="width: 400px; height: 300px;"></div>    
+        <div id="chart_prob_erro" style="width: 400px; height: 300px;"></div> 
+      </div>
+      <div id ="chart_cell" >
+         <div id="tb_chamadas" style=" width: 100%; height: 400px;"></div> 
+      </div>
+    </div>
+    
   </div>
             <div class="modal fade" id="largeModal" tabindex="-1" role="dialog" aria-labelledby="largeModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
@@ -89,13 +99,12 @@
 <div class="clearfix"></div>
 
 
+
 <!-- Right Panel -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@2.2.4/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.4/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-match-height@0.7.2/dist/jquery.matchHeight.min.js"></script>
-<script src="assets/js/main.js"></script>
-
 
 </body>
 </html>

@@ -1,4 +1,105 @@
-﻿//================== Logica do phaser		
+﻿		google.charts.load('current', {'packages':['corechart','table']});
+		google.charts.setOnLoadCallback(drawVisualization);
+		function drawVisualization() {
+        var dados = [['k', 'calculo de Poisson y=50;f(k,y)*100',"f poisson","y=f*24/10"]];
+
+        function fator(num){
+          var fat=1;
+          for(let x=1; x<=num; x++)
+          {
+            fat = fat *x;
+          }
+          return fat;
+        }
+
+        function howK(isIt){
+          var sum=0;
+          for (let k=1; k<= 110 ; k++){
+            sum+=k;
+            if(sum>=isIt){
+              return k;
+            }
+          }
+        }
+
+        function getPoissonFreq(c,tempo){
+          var t=howK(c);
+          var f1 = 1+ 1.96/Math.sqrt(t+14);
+          f1= f1*(t+15)/tempo;
+          return f1;
+        }
+        function getPoisson(y,t){
+          var f = Math.exp(-y)* Math.pow(y, t);
+          var fat = fator(t);
+          f= f /fat;
+          return f;
+        }
+
+        for (let c=1; c<=1000; c++){
+          var t=howK(c);
+          var poissonFreq = getPoissonFreq(c,24);
+          y=30; 
+          f= getPoisson(y,t);
+          var v = [];
+          v.push(c);
+          v.push(f*100);//calculo de Poisson
+          v.push(poissonFreq);//f poisson
+          var yi =poissonFreq*24/10; 
+          v.push(yi);//y=f*24/10
+          dados.push(v);
+        }
+        data = google.visualization.arrayToDataTable(dados);
+
+        options = {
+          title : 'Distribuição Poisson , em 24h',
+          backgroundColor: '#fff',
+          pointSize: 0,
+          vAxis: {title: 'Tempo em s'},
+          hAxis: {title: 'Chamadas'},
+          seriesType: 'line',
+          series: {0: {type: 'line'}}
+      };
+      	//teste1
+        chart = new google.visualization.ComboChart(document.getElementById('chart_poisson'));
+        chart.draw(data, options);
+        //teste2
+        chart = new google.visualization.ComboChart(document.getElementById('chart_prob_erro'));
+        chart.draw(data, options);
+        //teste table
+        
+        var cssClassNames = {
+			'headerRow': 'italic-darkblue-font large-font bold-font',
+			'tableRow': '',
+			'oddTableRow': 'beige-background',
+			'selectedTableRow': 'orange-background large-font',
+			'hoverTableRow': '',
+			'headerCell': 'gold-border',
+			'tableCell': '',
+			'rowNumberCell': 'underline-blue-font'};
+		var options = {'showRowNumber': true, 'allowHtml': true,'width':800 , 'cssClassNames': cssClassNames};
+		var data = new google.visualization.DataTable();
+		//... add data here ...
+        data.addColumn('boolean', 'Sucess?');
+        data.addColumn('string', 'Enlace');
+        data.addColumn('string', 'Rota');
+        data.addColumn('number', 'Distancia');
+        var rows= [[true,  {v: "10000", f: '5-1-4'}, '5-1-4', 120.5]];
+        for (let i=1;i<1000;i++){
+        	
+        	if (i > 500){
+				rows.push([false,   null,  null, null]);
+        	}
+        	else{
+        		rows.push([true,   {v:"8000",   f: '5-1-4'},  '5-1-4', 120.5]);
+        	}
+        }
+        data.addRows(rows);
+        //..
+		var table = new google.visualization.Table(document.getElementById('tb_chamadas'));
+		table.draw(data, options);
+    }
+
+//================== Logica do phaser		
 var game = new Phaser.Game(900, 411, Phaser.CANVAS, 'phaser-id',
  { preload: preload, create: create, update: update, render:render});
 // usando objetos ele altera valor do atributo
