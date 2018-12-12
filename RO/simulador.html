@@ -31,6 +31,14 @@
     <script src="js/phaser.min.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="js/script.js"></script>
+    <script>
+      function adicionar() {
+        var quantidade = document.getElementById("quantidadeOnda").value;
+        var lista  = document.getElementById("list_condas").innerHTML;
+        lista = lista +"<li name='item_conda' >"+quantidade+"</li>";
+        document.getElementById("list_condas").innerHTML = lista;
+      }
+    </script>
 
 </head>
 <body onmousemove="projeto()">
@@ -50,7 +58,7 @@
   <div class="div3">
     <div class="botoes">
       <button class="btn success" onclick="getStart()">INICIAR</button>
-      <button class="btn info" onclick="ajuda()">PROXIMA ETAPA</button>
+      <button class="btn info" id="btnprox_etapa" disabled onclick="prox_etapa()">PROXIMA ETAPA</button>
       <!-- <button class="btn danger" onclick="ajuda()">AJUDA</button> -->
       <button type="button" class="btn success" data-toggle="modal" data-target="#largeModal">CHAMADAS</button>
       <button class="btn danger" onclick=location.href="index.html">RETORNAR</button>
@@ -71,7 +79,7 @@
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="largeModalLabel">Calculo das chamadas</h5>
+                            <h5 class="modal-title" id="largeModalLabel">Configuração de cenário de teste</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -82,15 +90,21 @@
                             <div class="chamadas">
                               Quantidade de chamadas:<br>
                               <input type="text" id="quantidadeCall" value="1000"><br>
-                              Quantidade de nós:<br>
-                              <input type="text" id="quantidadeOnda" value="3"><br><br>
-                              <button onclick="callMeBaby()">Simular</button>
+                              Quantidade de comprimentos de onda:<br>
+                              <input type="text" id="quantidadeOnda" value="30">
+                              <button class="btn danger" id="add_onda" onclick="adicionar()" >+</button><br>
+                              <ul id="list_condas">
+                                <li name='item_conda'>20</li>
+                                <li name='item_conda'>40</li>
+                                <li name='item_conda'>80</li>
+                                <li name='item_conda'>100</li>
+                              </ul>
                             </div>
                           </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn danger" data-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn success">Confirm</button>
+                            <button type="button" class="btn success" onclick="callMeBaby()">Confirm</button>
                         </div>
                     </div>
                 </div>

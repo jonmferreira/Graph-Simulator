@@ -24,7 +24,7 @@
 
         function getPoissonFreq(c,tempo){
           var t=howK(c);
-          var f1 = 1+ 1.96/Math.sqrt(t+14);
+          var f1 = 1- ( 1.96/Math.sqrt(t+14) );
           f1= f1*(t+15)/tempo;
           return f1;
         }
@@ -63,8 +63,8 @@
         chart = new google.visualization.ComboChart(document.getElementById('chart_poisson'));
         chart.draw(data, options);
         //teste2
-        chart = new google.visualization.ComboChart(document.getElementById('chart_prob_erro'));
-        chart.draw(data, options);
+        //chart = new google.visualization.ComboChart(document.getElementById('chart_prob_erro'));
+        //chart.draw(data, options);
         //teste table
         
         var cssClassNames = {
@@ -469,10 +469,8 @@ var peso='';
 var overTap = false;
 var currentPoint;
 var centroid;
-var enterKey;
 var connection = 0;
 var makeLine = false;
-var enterStop;
 var style;
 var flag=false;
 //projeto
@@ -484,9 +482,7 @@ var etapa = {
 //Configuração de teclas de entrada de dados
 function config_buttons(){
 	//config teclas
-	enterStop = game.input.keyboard.addKey(Phaser.Keyboard.S);
 	spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-	enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
 }
 
 // funções de atualização
@@ -530,18 +526,21 @@ function update() {
 			setInputTap(false);
 	        etapa.fase=2;
 			etapa.em_execucao = 0;	
+			spaceKey.isDown = false;
 		}
 		break;
 		case 2:
-		  if ( etapa.em_execucao == 1  && enterStop.isDown){
+		  if ( etapa.em_execucao == 1  && spaceKey.isDown){
 		  	etapa.em_execucao = 0;
 			etapa.fase = 3;
 			flag=true;
 			salvarEstagio();
 			show=1;
+			spaceKey= false;
 		  }
-		  if (enterKey.isDown){
+		  if (spaceKey.isDown){
         	etapa.em_execucao = 1;
+        	spaceKey= false;
 		  }
 
 		  if ( etapa.em_execucao ){
@@ -675,6 +674,9 @@ function setDataLinhasPontos(){
 	game.paused = false;
 }
 function getStart(){
+	if( document.getElementById("btnprox_etapa").disabled != null){
+		document.getElementById("btnprox_etapa").disabled = false;	
+	}
 	etapa.fase++;
 	setInputTap(true);
 	game.paused = false;
@@ -773,8 +775,9 @@ function verificacaoInicial(){
 }
 
 // ===================== FUNÇÕES DE APOIO DO PROJETO ===== QUE PODEM SER MUDADO
-function ajuda(){
+function prox_etapa(){
 	show = 1;
+	etapa.fase ++;
 	projeto();
 }
 function projeto(){
@@ -785,9 +788,9 @@ function projeto(){
 		}
 		if(etapa.fase ==2){
 			
-			alert("\n\nPara começar a inserir as arestas aperte a tecla \"enter\" :"+
+			alert("\n\nPara começar a inserir as arestas aperte a tecla \"space\" :"+
 			"\nDiga o valor do peso e clique nos dois vertices que deseja criar a aresta."+
-			"\n\nPara encerrar,aperte a tecla \"s\".");
+			"\n\nPara encerrar,aperte a tecla \"space\".");
 		}
 	}
 }
