@@ -1,125 +1,64 @@
-﻿		google.charts.load('current', {'packages':['corechart','table']});
-		google.charts.setOnLoadCallback(drawVisualization);
-		function drawVisualization() {
-        var dados = [['k', 'calculo de Poisson y=50;f(k,y)*100',"f poisson","y=f*24/10"]];
-
-        function fator(num){
-          var fat=1;
-          for(let x=1; x<=num; x++)
-          {
-            fat = fat *x;
-          }
-          return fat;
-        }
-
-        function howK(isIt){
-          var sum=0;
-          for (let k=1; k<= 110 ; k++){
-            sum+=k;
-            if(sum>=isIt){
-              return k;
-            }
-          }
-        }
-
-        function getPoissonFreq(c,tempo){
-          var t=howK(c);
-          var f1 = 1- ( 1.96/Math.sqrt(t+14) );
-          f1= f1*(t+15)/tempo;
-          return f1;
-        }
-        function getPoisson(y,t){
-          var f = Math.exp(-y)* Math.pow(y, t);
-          var fat = fator(t);
-          f= f /fat;
-          return f;
-        }
-
-        for (let c=1; c<=1000; c++){
-          var t=howK(c);
-          var poissonFreq = getPoissonFreq(c,24);
-          y=30; 
-          f= getPoisson(y,t);
-          var v = [];
-          v.push(c);
-          v.push(f*100);//calculo de Poisson
-          v.push(poissonFreq);//f poisson
-          var yi =poissonFreq*24/10; 
-          v.push(yi);//y=f*24/10
-          dados.push(v);
-        }
-        data = google.visualization.arrayToDataTable(dados);
-
-        options = {
-          title : 'Distribuição Poisson , em 24h',
-          backgroundColor: '#fff',
-          pointSize: 0,
-          vAxis: {title: 'Tempo em s'},
-          hAxis: {title: 'Chamadas'},
-          seriesType: 'line',
-          series: {0: {type: 'line'}}
-      };
-      	//teste1
-        chart = new google.visualization.ComboChart(document.getElementById('chart_poisson'));
-        chart.draw(data, options);
-        //teste2
-        //chart = new google.visualization.ComboChart(document.getElementById('chart_prob_erro'));
-        //chart.draw(data, options);
-        //teste table
-        
-        var cssClassNames = {
-			'headerRow': 'italic-darkblue-font large-font bold-font',
-			'tableRow': '',
-			'oddTableRow': 'beige-background',
-			'selectedTableRow': 'orange-background large-font',
-			'hoverTableRow': '',
-			'headerCell': 'gold-border',
-			'tableCell': '',
-			'rowNumberCell': 'underline-blue-font'};
-		var options = {'showRowNumber': true, 'allowHtml': true,'width':800 , 'cssClassNames': cssClassNames};
-		var data = new google.visualization.DataTable();
-		//... add data here ...
-        data.addColumn('boolean', 'Sucess?');
-        data.addColumn('string', 'Enlace');
-        data.addColumn('string', 'Rota');
-        data.addColumn('number', 'Distancia');
-        var rows= [[true,  {v: "10000", f: '5-1-4'}, '5-1-4', 120.5]];
-        for (let i=1;i<1000;i++){
-        	
-        	if (i > 500){
-				rows.push([false,   null,  null, null]);
-        	}
-        	else{
-        		rows.push([true,   {v:"8000",   f: '5-1-4'},  '5-1-4', 120.5]);
-        	}
-        }
-        data.addRows(rows);
-        //..
-		var table = new google.visualization.Table(document.getElementById('tb_chamadas'));
-		table.draw(data, options);
-    }
-
-//================== Logica do phaser		
+﻿//================== Logica do phaser		
 var game = new Phaser.Game(900, 411, Phaser.CANVAS, 'phaser-id',
  { preload: preload, create: create, update: update, render:render});
-// usando objetos ele altera valor do atributo
-class A{
-	constructor(an){
-		this.an= an;
-		this.an.a = '1';
-	}
-}
-var as = {a:0};
-af = new A(as);
-console.log(as);
 
-//========== teste acima
+
+class Poisson{
+	constructor(quantidadeChamadas ,periodo, y){
+		this.fatoriais = [1];
+		this.y = y;
+		this.T =periodo; 
+		this.quantidadeChamadas = quantidadeChamadas;
+		this.initFatorial();
+
+	}
+	initFatorial(){
+		var sum=0,k;
+      	for ( k=1; k<= 45 ; k++){//fazer bignum
+	        sum+=k;
+	        if(sum>= this.quantidadeChamadas ){
+	        	break;
+	        }
+	    }
+	    var fat=1;
+      	for(let x=1; x <= k; x++)
+      	{
+       	 fat = fat *x;
+       	 this.fatoriais.push(fat);
+      	}
+	}
+	fator(num){
+      return this.fatoriais[num];
+    }
+    howK(isIt){
+      var sum=0;
+      for (let k=1; k<= 1100 ; k++){
+        sum+=k;
+        if(sum>=isIt){
+          return k;
+        }
+      }
+    }
+    getPoissonFreq(ichamada){
+      var k =this.howK(ichamada);
+      var f1 = 1- ( 1.96/Math.sqrt( k +14) );
+      f1= f1*( k + 15 )/ this.T;
+      return f1;
+    }
+    getPoisson(ichamada){
+      var k =this.howK(ichamada);
+      var f = Math.exp(-this.y)* Math.pow( this.y, k);
+      var fat = this.fator(k);
+      f= f /fat;
+      return f;
+    }
+}
 class Grafo{
 	
 	constructor(quantidadePoints){
-		this.infinito = Number.MAX_SAFE_INTEGER;
+		this.infinito = 1000;//Number.MAX_SAFE_INTEGER;
 		this.lengthVertices = quantidadePoints;
-		this.enlaces = {};
+		this.enlaces = [];
 		this.inicializarGrafo();
 	}
 	Infinito(){
@@ -127,10 +66,10 @@ class Grafo{
 	}
 	inicializarGrafo(){
 		this.matrizADJ = [];
-		for(var i=0;i< this.lengthVertices;i++){
+		for(var i=0;i<= this.lengthVertices;i++){
 	        let linha=[];
 	        this.matrizADJ.push(linha);
-	        for(var j=0;j<this.lengthVertices;j++){
+	        for(var j=0;j<=this.lengthVertices;j++){
 	        this.matrizADJ[i].push(this.infinito);//se tem ou nao ligação
 	        }
     	}
@@ -187,7 +126,7 @@ class Grafo{
 				 	}
 				 },
 				 atualizaReserva2: function(tempoDecorrido){//testar isso aqui usando foreach
-				 	ondasReservadas.foreach(
+				 	ondasReservadas.forEach(
 				 		function(element, index, array){
 				 			element.updateReserva( tempoDecorrido) ;
 				 		} );
@@ -213,7 +152,36 @@ class Grafo{
 	}
 	reservarEnlace(u,v,onda,tempo){
 		var cod = Grafo.toParCode(u,v);
-		this.enlaces[ cod ].reservar(onda,tempo);
+		let enlace = this.enlaces[ cod ];
+		if( enlace != null ){
+			enlace.reservar(onda,tempo);	
+			return "ok";
+		}else{
+			return "so bad";
+		}
+
+		
+	}
+	reservarEnlaces( vet_caminho, onda, tempo ){
+		for( let i=0; i< vet_caminho.length -1; i++){
+			if (this.reservarEnlace( vet_caminho[i]+1, vet_caminho[i+1]+1, onda, tempo ) == "so bad"){
+				return "so bad";
+			}
+		}
+		return "ok";
+	}
+	updateTempoEnlaces(atualizaReserva){
+		this.enlaces.forEach( function(element, index, array){
+			element.atualizaReserva(atualizaReserva);
+		}
+		);
+		/*metodo 2*
+		
+		let chaves = Object.keys(this.enlaces);
+		chaves.forEach(function(element, index, array){
+			this.enlaces[element].atualizaReserva(atualizaReserva);
+		});*/
+		
 	}
 	static toParCode(u,v){
 		if (u>v){
@@ -230,7 +198,7 @@ class GraphAlgoritms{
 	}
 	menorCaminho(origem,destino){
 		
-		var saida =  this.menorCaminho_init(origem,destino);
+		var saida =  this.menorCaminho_init(origem-1,destino-1);
 		return saida;
 	}
 	menorCaminho_init(origem,destino){
@@ -242,28 +210,27 @@ class GraphAlgoritms{
 	    var adj=[];
 		
 		var vertices= this.graph.lengthVertices;
-	    for(var i =0;i< vertices; i++){
+	    for(var i =0;i<= vertices; i++){
 	        distancias.push(this.infinito );
 	        visitados.push(false);
 	    }
 
 	    this.caminho.push(origem);
-	    distancias[origem-1] = 0;
-	    conj.unshift(origem-1);
-		var u =  origem-1;
+	    distancias[origem] = 0;
+		var u =  origem;
 
 		this.menorCaminho_loop(u,destino,distancias,conj,visitados);
 
-		var str_saida={
+		var obj_saida={
 			vetorDistacia: distancias,
-			custoPercusso:distancias[destino-1],
-			percusso: JSON.stringify(this.saida)
+			custoPercusso:distancias[destino],
+			percusso: this.saida, 
+			onda_disponivel:0
 		}; 
 		
-		return str_saida;
+		return obj_saida;
 	}
 	menorCaminho_loop(u,fim,distancias,conj,visitados){
-		var u=  conj.pop();
 
 		if(visitados[u]==false){
 			visitados[u]=true;
@@ -272,10 +239,9 @@ class GraphAlgoritms{
 				var v= i;
 				//nesta verificação, vc tbm verifica se há caminho disponível
 				if(this.graph.matrizADJ[u][v] != this.infinito ){
-					if(distancias[v] > distancias[u]+this.graph.matrizADJ[u][v]){
+					if(   distancias[v]  > distancias[u]+this.graph.matrizADJ[u][v]){
 
 						distancias[v]= distancias[u]+this.graph.matrizADJ[u][v];//atualiza
-						conj.unshift( v );
 						if( !this.atualizarCaminho(v,fim) ){
 							this.menorCaminho_loop(v,fim,distancias,conj,visitados);
 						}
@@ -292,7 +258,7 @@ class GraphAlgoritms{
 	}
 
 	atualizarCaminho(v,fim){
-		this.caminho.push(v+1);
+		this.caminho.push(v);
 		if ( this.caminho[this.caminho.length-1] == fim){
 			this.saida=[];
 			for ( var i=0; i< this.caminho.length; i++){
@@ -305,35 +271,109 @@ class GraphAlgoritms{
 }
 //Talves essa funcção deva estar dentro de uma classe Redes Oticas//ultima prioridade
 function criarGrafoChamadas(quantidadeChamadas,ondas){
-	rd = new RedesOticas(points, dataLinhasPontos, quantidadeChamadas, ondas);
-	console.log(rd);
+	//TODO precisa informar dados de Poisson
+	rd = new RedesOticas(points, dataLinhasPontos, quantidadeChamadas, ondas,24);//periodo = 24h
+	//console.log(rd);
 	console.log("simulando cenario de RD");
-	console.log(rd.simularCenario());
+	var dados =rd.simularCenario();
+	console.log(dados);
 }
 //== no futuro passar tudo para duas classes
+
 class RedesOticas{
-	constructor(points, dataLinhasPontos, quantidade,ondasLim){
+	constructor(points, dataLinhasPontos, quantidade,ondasLim, periodoTeste){
 		this.points = points;
 		this.limiteOndas= ondasLim;
 		this.dataLinhasPontos = dataLinhasPontos;
 		this.quantidadeChamadas = quantidade;
 		this.calls = {};
+		this.periodoTeste = periodoTeste;
 	}
+	//TODO:TEmos uma lista de ondas
 	simularCenario(){
 		this.grafoOtico = new Grafo(this.points.length);
 		this.grafoOtico.setConfigInit(this.dataLinhasPontos, this.limiteOndas );
-		this.calls = Chamadas.gerarChamadas(this.quantidadeChamadas, this.points.length);
+		this.calls = Chamadas.gerarChamadas(this.quantidadeChamadas, this.points.length, this.periodoTeste, 30);
 		this.calls.realizarVerificoes( this.grafoOtico );
+		this.plotGraficos();
 		return this.calls;
 	}
-	
+	plotGraficos(){
+		google.charts.load('current', {'packages':['corechart','table']});
+		google.charts.setOnLoadCallback(this.drawVisualization(this.quantidadeChamadas,this.calls));
+	}
+	drawVisualization(quantidadeChamadas,calls) {
+			var dataPoisson = [['k', 'Tempo em Poisson',"frequência de confiança"]];
+
+			
+
+			var rows = [];
+			var myPoisson = new Poisson( quantidadeChamadas, this.periodoTeste, 30);
+			for (let c=0; c< quantidadeChamadas; c++){
+
+				var poissonFreq = myPoisson.getPoissonFreq(c);
+				var v = [];
+				v.push(c);
+				v.push(myPoisson.getPoisson(c)*100);//calculo de Poisson
+				v.push(poissonFreq);//f poisson
+
+				dataPoisson.push(v);
+				var verificacao =calls.verificacoes[c]; 
+				if(verificacao == null){
+					console.log("algo errado");
+					console.log("indece: ",c);
+				}
+				else{
+					rows.push( [true, verificacao.par,verificacao.getStr(), verificacao.distancia] );	
+				}
+				
+			}
+			data = google.visualization.arrayToDataTable(dataPoisson);
+
+			options = {
+			  title : 'Distribuição Poisson , em 24h',
+			  backgroundColor: '#fff',
+			  pointSize: 0,
+			  vAxis: {title: 'Tempo em s'},
+			  hAxis: {title: 'Chamadas'},
+			  seriesType: 'line',
+			  series: {0: {type: 'line'}}
+			};
+			var dataTable = new google.visualization.DataTable();
+			//... add data here ...
+			dataTable.addColumn('boolean', 'Sucess?');
+			dataTable.addColumn('string', 'Enlace');
+			dataTable.addColumn('string', 'Rota');
+			dataTable.addColumn('number', 'Distancia');
+			dataTable.addRows(rows);
+			var chart = new google.visualization.ComboChart(document.getElementById('chart_poisson'));
+			chart.draw(data, options);
+	        //chart = new google.visualization.ComboChart(document.getElementById('chart_prob_erro'));
+	        //chart.draw(data, options);
+	        //teste table
+	        
+			var cssClassNames = {
+				'headerRow': 'italic-darkblue-font large-font bold-font',
+				'tableRow': '',
+				'oddTableRow': 'beige-background',
+				'selectedTableRow': 'orange-background large-font',
+				'hoverTableRow': '',
+				'headerCell': 'gold-border',
+				'tableCell': '',
+				'rowNumberCell': 'underline-blue-font'};
+			var options = {'showRowNumber': true, 'allowHtml': true,'width':800 , 'cssClassNames': cssClassNames};
+
+			var table = new google.visualization.Table(document.getElementById('tb_chamadas'));
+			table.draw(dataTable, options);
+	    }
 }
 
 class Chamadas{
-	constructor(quantidade){
+	constructor(quantidade, periodoTeste, y){
     	this.quantidade = quantidade;
     	this.buscas = [];
     	this.verificacoes = [];
+    	this.myPoisson = new Poisson(quantidade, periodoTeste, y);
 	}
 	getIndexChamada(u,v){
     	var disponivel= -1;
@@ -346,18 +386,30 @@ class Chamadas{
     	return disponivel;
     }
     realizarVerificoes( grafo ){
-    	var graphAlgoritms = new GraphAlgoritms( grafo );
+    	
     	for( let i =0;i < this.quantidade;i++){
-
+    		var graphAlgoritms = new GraphAlgoritms( grafo );
 			var u = this.verificacoes[i].u;
 			var v = this.verificacoes[i].v;
 			if (i != 0){
-				//TODO: se não for primeiro, CALCULA TEMPO DE PROXIMA CHAMADA
+				let tempoEspera = this.myPoisson.getPoissonFreq(i+1);
+				grafo.updateTempoEnlaces(tempoEspera);
 				//TODO: atualiza todos enlances;
 			}
 			var r = graphAlgoritms.menorCaminho( u, v );
 			//TODO: calcular aqui o tempo de chamada
+			let tempoReserva = this.myPoisson.getPoisson(i+1)*100;
+			if(isNaN(tempoReserva)){
+				tempoReserva = 1;
+			}
 			//TODO: reservar aqui cada enlace do caminho na onda y com tempo tal
+			if ( r !=null){
+				if (grafo.reservarEnlaces(r.percusso, r.onda_disponivel,tempoReserva) == "so bad"){
+					console.log("erro com caminho,onda,tempo");
+					console.log(r,tempoReserva);
+					console.log("u,v:",u,v);
+				}
+			} 
 			//TODO: Isso se o retorno não retornou bloqueio ne.
 			this.verificacoes[i].setData( r.percusso, r.custoPercusso);
 			let indiceCall =  this.getIndexChamada(u,v);
@@ -378,9 +430,9 @@ class Chamadas{
 		}
 		return {u:u,v:v};
     }
-    static gerarChamadas(quantidade, totalPontos){
+    static gerarChamadas(quantidade, totalPontos, periodoTeste, y ){
 	
-	    var chamadas = new Chamadas(quantidade);
+	    var chamadas = new Chamadas(quantidade, periodoTeste, y);
 		for(var i=1;i<=quantidade;i++ ){
 			var par = Chamadas.gerarRandomPar(totalPontos);
 			var u = par.u;
@@ -403,7 +455,7 @@ class Chamadas{
 }
 class BuscaChamada{
 	constructor(u,v){
-		this.par=""+u+"-"+v,
+		this.par= Grafo.toParCode(u,v);
 		this.u = u;
 		this.v = v;
 		this.caminhos = [/*{class caminho}*/];
@@ -426,15 +478,22 @@ class BuscaChamada{
 }
 class VerificacaoChamada{
 	constructor(u,v){
-		this.par=""+u+"-"+v,
+		this.par="" + u + "-" + v;
 		this.u = u;
 		this.v = v;
 		this.caminho = "";
-		this.distancia=-1;
+		this.distancia= -1 ;
 	}
 	setData(caminho,distancia){
 		this.caminho = caminho;
 		this.distancia = distancia;
+	}
+	getStr(){
+		var src = ""+(this.caminho[0]+1);
+		for(let i=0; i< this.caminho.length; i++){
+			src = src +"-"+ (this.caminho[i]+1);
+		}
+		return src;
 	}
 }
 class Caminho{
@@ -445,6 +504,7 @@ class Caminho{
 	equals(rota){
 		return this.rota.localeCompare(rota)==0;
 	}
+	
 }
 
 function getRandomInt(min, max) {
@@ -614,12 +674,18 @@ function inicarParPoint(){
 					saveObject.v = this.v;
 					saveObject.peso = this.peso;
 					return JSON.stringify(saveObject);
+				},
+				equals:function(outro){
+					return outro.u== this.u && outro.v == this.v;
 				}
 			};
 	return  aux;
 }
 function configParPoint(idP1,idP2, peso){
 	var aux = inicarParPoint();
+	if (idP1 > idP2 ){
+		var t = idP1; idP1 = idP2; idP2= t;
+	}
 	aux.u = idP1;
 	aux.v = idP2;
     var p1Point  = getPoint(idP1);
@@ -628,6 +694,20 @@ function configParPoint(idP1,idP2, peso){
 	aux.peso = peso;
 	aux.linha = line;
 	return aux;
+}
+function addParDataLinha(auxNovo){
+	var achouSemelhante= false;
+	for( let i=0; i< dataLinhasPontos.length;i++ ){
+		if( dataLinhasPontos[i].equals(auxNovo)  ){
+			achouSemelhante= true;
+			if( dataLinhasPontos[i].peso > auxNovo.peso ){
+				dataLinhasPontos[i].peso = auxNovo.peso;
+			}
+		}
+	}
+	if ( !achouSemelhante){
+		dataLinhasPontos.push(auxNovo);
+	}
 }
 
 function connectLine() {
@@ -643,14 +723,22 @@ function connectLine() {
             //aux.push(adjPesos[1]);
             var selection ;
             do{
-    			selection = parseInt(prompt("Please enter a number from 1 to 100", "peso"), 10);
-			}while(isNaN(selection) || selection > 100 || selection < 1);
+    			selection = parseInt(prompt("Please enter a number from 1 to 10.000", "peso"), 10);
+    			if ( isNaN(selection) ){
+    				break;
+    			}
+			}while( selection > 10000 || selection < 1);
 			peso = selection;
-            
-            aux = configParPoint(adjPesos[0],adjPesos[1],peso);
-            dataLinhasPontos.push(aux);//guarda as arestas  com infor de origem,destino e peso            
-            makeLine=true;
-			resetFindParPoint();
+            if( isNaN(selection) ){
+            	this.connection =0;
+            	adjPesos = [];
+            }
+            else{
+	            aux = configParPoint(adjPesos[0],adjPesos[1],peso);
+	            addParDataLinha(aux);//guarda as arestas  com infor de origem,destino e peso            
+	            makeLine=true;
+				resetFindParPoint();	
+            }
         }
     }
 }
@@ -663,9 +751,14 @@ function getPoint(id){
 	return points[id-1];
 }
 function getPoints (point) {
-  
-   adjPesos.push(points.indexOf(point)+1);
-   this.connection+=1;
+  var indice = points.indexOf(point)+1;  
+   if( adjPesos.length>0 && adjPesos[0] != indice ){
+   	adjPesos.push( indice );
+   	this.connection+=1;
+   }else if( adjPesos.length == 0 ) {
+   	adjPesos.push( indice );
+   	this.connection+=1;
+   }
 }
 function setDataLinhasPontos(){
 	setInputTap(false);
@@ -714,25 +807,6 @@ function salvar(obj) {
 		titulo+= str_data;
 		var blob = new Blob([obj], { type: "text/plain;charset=utf-8" });
 		saveAs(blob, titulo + ".txt");
-}
-
-// leitura de arquivo =======================
-function fileSelect(files) {
-    var f = files[0]; // FileList object
-    var output = [];
-    
-    if (f != null){
-    	var leitor = new FileReader();
-		leitor.onload = leCSV;
-		leitor.readAsText(f);
-    }	
-    function leCSV(evt) {
-		var fileArr = evt.target.result;
-		console.log(result);
-		var saveObject = JSON.parse(fileArr).grafo; 
-		window.window.location.href="simulador.html";
-		sessionStorage.setItem('graph_simulatorSave', JSON.stringify(saveObject));
-	}
 }
 
 function dataSaved(){
@@ -800,8 +874,21 @@ function callMeBaby(){
 	var calls = document.getElementById("quantidadeCall").value;
 	var ondas = document.getElementById("quantidadeOnda").value;
 	quantidade = parseInt( calls );
-	if( quantidade>=1 &&  quantidade<=1000){
-		criarGrafoChamadas(quantidade,ondas);
+	if( quantidade>=1 &&  quantidade<=100000){
+		criarGrafoChamadas(quantidade,ondas);//alocar dados também de tempo de Poisson
 		etapa.fase = 4;
 	}
 }
+
+// usando objetos ele altera valor do atributo
+/*class A{
+	constructor(an){
+		this.an= an;
+		this.an.a = '1';
+	}
+}
+var as = {a:0};
+af = new A(as);
+console.log(as);*/
+
+//========== teste acima
