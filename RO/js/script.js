@@ -523,10 +523,10 @@ function update() {
     		currentPoint.position.copyFrom(game.input.activePointer.position);
 		}
 		else{			
+			spaceKey.isDown = false;
 			setInputTap(false);
 	        etapa.fase=2;
 			etapa.em_execucao = 0;	
-			spaceKey.isDown = false;
 		}
 		break;
 		case 2:
@@ -536,11 +536,11 @@ function update() {
 			flag=true;
 			salvarEstagio();
 			show=1;
-			spaceKey= false;
+			spaceKey.isDown= false;
 		  }
 		  if (spaceKey.isDown){
+		  	spaceKey.isDown= false;
         	etapa.em_execucao = 1;
-        	spaceKey= false;
 		  }
 
 		  if ( etapa.em_execucao ){
@@ -674,9 +674,9 @@ function setDataLinhasPontos(){
 	game.paused = false;
 }
 function getStart(){
-	if( document.getElementById("btnprox_etapa").disabled != null){
+	/*if( document.getElementById("btnprox_etapa").disabled != null){
 		document.getElementById("btnprox_etapa").disabled = false;	
-	}
+	}*/
 	etapa.fase++;
 	setInputTap(true);
 	game.paused = false;
