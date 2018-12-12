@@ -304,9 +304,6 @@ class RedesOticas{
 	}
 	drawVisualization(quantidadeChamadas,calls) {
 			var dataPoisson = [['k', 'Tempo em Poisson',"frequência de confiança"]];
-
-			
-
 			var rows = [];
 			var myPoisson = new Poisson( quantidadeChamadas, this.periodoTeste, 30);
 			for (let c=0; c< quantidadeChamadas; c++){
