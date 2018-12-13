@@ -1,12 +1,12 @@
-﻿//================== Logica do phaser		
-var game = new Phaser.Game(900, 411, Phaser.CANVAS, 'phaser-id',
+﻿//================== Logica do phaser
+var game = new Phaser.Game(900, 391, Phaser.CANVAS, 'phaser-id',
  { preload: preload, create: create, update: update, render:render});
 
 
 class Poisson{
 	constructor(quantidadeChamadas ,periodo, y){
 		this.y = y;
-		this.T =periodo; 
+		this.T =periodo;
 		this.quantidadeChamadas = quantidadeChamadas;
 	}
 	fator(num){
@@ -44,7 +44,7 @@ class Poisson{
     }
 }
 class Grafo{
-	
+
 	constructor(quantidadePoints){
 		this.infinito = 1000;//Number.MAX_SAFE_INTEGER;
 		this.lengthVertices = quantidadePoints;
@@ -82,7 +82,7 @@ class Grafo{
 		var u = enlace.u;
 		var v = enlace.v;
 		if (u> v){
-			var t =u;u=v;v=t; 
+			var t =u;u=v;v=t;
 		}
 		this.enlaces[Grafo.toParCode(u,v)]= ( this.criarEnlance( u, v, enlace.peso ) );
 	}
@@ -120,7 +120,7 @@ class Grafo{
 				 		function(element, index, array){
 				 			element.updateReserva( tempoDecorrido) ;
 				 		} );
-				 		
+
 				 },
 				 isOndaDisponivel: function(onda){
 				 	return  ! this.ondasReservadas[onda].isReservado();
@@ -144,11 +144,11 @@ class Grafo{
 		var cod = Grafo.toParCode(u,v);
 		let enlace = this.enlaces[ cod ];
 		if( enlace != null && this.isEnlaceDisponivel(u,v,onda) ){
-			enlace.reservar(onda,tempo);	
+			enlace.reservar(onda,tempo);
 			return "ok";
 		}else{
 			return "so bad";
-		}		
+		}
 	}
 	reservarEnlaces( vet_caminho, onda, tempo ){
 		for( let i=0; i< vet_caminho.length -1; i++){
@@ -180,7 +180,7 @@ class Grafo{
 		}
 		);
 		/*metodo 2*
-		
+
 		let chaves = Object.keys(this.enlaces);
 		chaves.forEach(function(element, index, array){
 			this.enlaces[element].atualizaReserva(atualizaReserva);
@@ -211,7 +211,7 @@ class GraphAlgoritms{
 	    var visitados = [];
 	    var conj = [];
 	    var adj=[];
-		
+
 		var vertices= this.graph.lengthVertices;
 	    for(var i =0;i<= vertices; i++){
 	        distancias.push(this.infinito );
@@ -227,10 +227,10 @@ class GraphAlgoritms{
 		var obj_saida={
 			vetorDistacia: distancias,
 			custoPercusso:distancias[destino],
-			percusso: this.saida, 
+			percusso: this.saida,
 			onda_disponivel: this.onda_encontrada
-		}; 
-		
+		};
+
 		return obj_saida;
 	}
 	menorCaminho_loop(u,fim,distancias,conj,visitados){
@@ -266,7 +266,7 @@ class GraphAlgoritms{
 				for ( var i=0; i< this.caminho.length; i++){
 					this.saida.push( this.caminho[i] );
 				}
-				return true;	
+				return true;
 			}
 		}
 		return false;
@@ -290,14 +290,14 @@ function simularCenario_Otico(quantidadeChamadas,list_ondas, periodo){
 
 	console.log(simulacoes);
 	limChamadas = quantidadeChamadas;
-	
+
 	plotGraficoErro(list_ondas,simulacoes);
 }
 function plotbyId(value){
 	if(limChamadas > 8000 ){
 		alert("Limite para plot é 8000 chamadas,devido aos limites do PC na fórmula de fatorial.");
 	}else{
-		plotGrafico(0,limChamadas,simulacoes[value]);	
+		plotGrafico(0,limChamadas,simulacoes[value]);
 	}
 }
 function addOpcoes(list_ondas){
@@ -314,7 +314,7 @@ function plotGraficoErro(list_ondas,simulacoes){
 function drawErro(list_ondas,simulacoes){
 	var dataBloqueio = [['onda','%Bloqueio']];
 
-	
+
 	for (let i=0;i< simulacoes.length;i++ ){
 		var row=[list_ondas[i], simulacoes[i].prob_Erro()*100 ];
 		dataBloqueio.push(row);
@@ -336,7 +336,7 @@ function plotGrafico(id,quantidadeChamadas,simulacao){
 	google.charts.load('current', {'packages':['corechart','table']});
 	if( id== 0 ){
 		google.charts.setOnLoadCallback(drawSimulation(quantidadeChamadas,simulacao));
-	}	
+	}
 }
 function drawSimulation(quantidadeChamadas,calls){
 			var dataPoisson = [['k', 'Tempo em Poisson',"frequência de confiança"]];
@@ -351,17 +351,17 @@ function drawSimulation(quantidadeChamadas,calls){
 				v.push(poissonFreq);//f poisson
 
 				dataPoisson.push(v);
-				var verificacao =calls.verificacoes[c]; 
+				var verificacao =calls.verificacoes[c];
 				if(verificacao == null){
 					console.log("algo errado");
 					console.log("indice: ",c);
 				}
 				else{
 					rows.push( [c+1,verificacao.sucessRoteamento,
-						verificacao.ondaAlocada!=null?"y"+verificacao.ondaAlocada:null , 
-						verificacao.par,verificacao.getStr(), 
-						verificacao.distancia, 
-						verificacao.tempoAlocado] );	
+						verificacao.ondaAlocada!=null?"y"+verificacao.ondaAlocada:null ,
+						verificacao.par,verificacao.getStr(),
+						verificacao.distancia,
+						verificacao.tempoAlocado] );
 				}
 			}
 			data = google.visualization.arrayToDataTable(dataPoisson);
@@ -389,11 +389,11 @@ function drawSimulation(quantidadeChamadas,calls){
 			dataTable.addColumn('number', 'D(km)');
 			dataTable.addColumn('number', 'timeout');
 			dataTable.addRows(rows);
-			
+
 	        //chart = new google.visualization.ComboChart(document.getElementById('chart_prob_erro'));
 	        //chart.draw(data, options);
 	        //teste table
-	        
+
 			var cssClassNames = {
 				'headerRow': 'italic-darkblue-font large-font bold-font',
 				'tableRow': '',
@@ -428,7 +428,7 @@ class RedesOticas{
 		this.calls = Chamadas.gerarChamadas(this.quantidadeChamadas, this.points.length, this.periodoTeste, limiteOndas);
 		this.calls.realizarVerificoes( this.grafoOtico );
 		return this.calls;
-	}	
+	}
 }
 
 class Chamadas{
@@ -459,7 +459,7 @@ class Chamadas{
 			if (i != 0){
 				let tempoEspera = this.myPoisson.getPoissonFreq(i+1);
 				grafo.updateTempoEnlaces(tempoEspera);//: atualiza todos enlances;
-				
+
 			}
 			var r = graphAlgoritms.menorCaminho( u, v );
 			let tempoReserva = this.myPoisson.getPoisson(i+1);//: calcular aqui o tempo de chamada
@@ -473,14 +473,14 @@ class Chamadas{
 					console.log("u,v:",u,v);
 				}
 				//let indiceCall =  this.getIndexChamada(u,v);
-				
+
 				//this.buscas[indiceCall].addCaminho( r.percusso, r.custoPercusso);//TODO:adicionar na busca o tempo alocado
-			} 
+			}
 			var success = this.verificacoes[i].setData( r.percusso, r.custoPercusso,r.onda_disponivel,tempoReserva  );//: Isso se o retorno não retornou bloqueio ne.
 			this.bloqueios = this.bloqueios + ( success !=true?1:0 );
-			
+
 			if(r.onda_disponivel == -1){
-				console.log("deu bloq "+this.limOndas);	
+				console.log("deu bloq "+this.limOndas);
 			}
 		}
 		return this.verificacoes;
@@ -501,7 +501,7 @@ class Chamadas{
 		return {u:u,v:v};
     }
     static gerarChamadas(quantidade, totalPontos, periodoTeste, y ){
-	
+
 	    var chamadas = new Chamadas(quantidade, periodoTeste, y);
 		for(var i=1;i<=quantidade;i++ ){
 			var par = Chamadas.gerarRandomPar(totalPontos);
@@ -581,7 +581,7 @@ class Caminho{
 	equals(rota){
 		return this.rota.localeCompare(rota)==0;
 	}
-	
+
 }
 
 function getRandomInt(min, max) {
@@ -591,7 +591,7 @@ function getRandomInt(min, max) {
 }
 
 
-//================== Logica do phaser		
+//================== Logica do phaser
 
 function preload() {
     game.load.spritesheet('centroid', 'img/balls.png', 17, 17);
@@ -638,10 +638,10 @@ function create() {
 	currentPoint.anchor.set(0.5);
 	currentPoint.alpha = 0.9;
 	game.input.onTap.add(onTapHandler, this);
-	
+
 }
 function update() {
-    
+
     switch ( etapa.fase ){
     	case 0:
     		setInputTap(false);
@@ -659,11 +659,11 @@ function update() {
     	if(!spaceKey.isDown){
     		currentPoint.position.copyFrom(game.input.activePointer.position);
 		}
-		else{			
+		else{
 			spaceKey.isDown = false;
 			setInputTap(false);
 	        etapa.fase=2;
-			etapa.em_execucao = 0;	
+			etapa.em_execucao = 0;
 		}
 		break;
 		case 2:
@@ -729,7 +729,7 @@ function onTapHandler(pointer, doubleTap) {
     }
 }
 function createImg(x,y, id){
-	var img = game.add.sprite(x, y, 'centroid', 0);        
+	var img = game.add.sprite(x, y, 'centroid', 0);
         img.anchor.set(0.5);
         img.alpha = 0.7;
         img.inputEnabled = true;
@@ -788,11 +788,11 @@ function addParDataLinha(auxNovo){
 }
 
 function connectLine() {
-   
+
     for(var i=0;i<points.length;i++){
-       
+
         if(this.connection<2){
-            
+
             points[i].events.onInputDown.add(getPoints, this,points[i]);
         }else{
 			//TODO::DÁ PRA TRANSFORMAR ISSO AQUI NUMA ESTRUTURA MELHOR
@@ -812,9 +812,9 @@ function connectLine() {
             }
             else{
 	            aux = configParPoint(adjPesos[0],adjPesos[1],peso);
-	            addParDataLinha(aux);//guarda as arestas  com infor de origem,destino e peso            
+	            addParDataLinha(aux);//guarda as arestas  com infor de origem,destino e peso
 	            makeLine=true;
-				resetFindParPoint();	
+				resetFindParPoint();
             }
         }
     }
@@ -828,7 +828,7 @@ function getPoint(id){
 	return points[id-1];
 }
 function getPoints (point) {
-  var indice = points.indexOf(point)+1;  
+  var indice = points.indexOf(point)+1;
    if( adjPesos.length>0 && adjPesos[0] != indice ){
    	adjPesos.push( indice );
    	this.connection+=1;
@@ -845,7 +845,7 @@ function setDataLinhasPontos(){
 }
 function getStart(){
 	/*if( document.getElementById("btnprox_etapa").disabled != null){
-		document.getElementById("btnprox_etapa").disabled = false;	
+		document.getElementById("btnprox_etapa").disabled = false;
 	}*/
 	etapa.fase++;
 	setInputTap(true);
@@ -877,9 +877,9 @@ function salvar(obj) {
 
 		let titulo = "graph";
 		var data = new Date();
-		var dia     = data.getDate();            
-		var mes     = data.getMonth();          
-		var ano4    = data.getFullYear(); 
+		var dia     = data.getDate();
+		var mes     = data.getMonth();
+		var ano4    = data.getFullYear();
 		var str_data = ano4 + '-' + (mes+1) + '-' + dia;
 		titulo+= str_data;
 		var blob = new Blob([obj], { type: "text/plain;charset=utf-8" });
@@ -896,7 +896,7 @@ function dataSaved(){
 			return true;
 			//setDataLinhasPontos();
 		}
-		else return false;		
+		else return false;
 }
 
 function criarPontos(saveObject){
@@ -938,7 +938,7 @@ function projeto(){
 			alert("Coloque os pontos clicando."+"\n"+"Para encerrar a inserção de pontos aperte a tecla \"space\".");
 		}
 		if(etapa.fase ==2){
-			
+
 			alert("\n\nPara começar a inserir as arestas aperte a tecla \"space\" :"+
 			"\nDiga o valor do peso e clique nos dois vertices que deseja criar a aresta."+
 			"\n\nPara encerrar,aperte a tecla \"space\".");

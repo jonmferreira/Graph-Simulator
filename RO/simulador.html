@@ -31,8 +31,8 @@
     <script src="js/phaser.min.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="js/script.js"></script>
-    
-    <script type="text/javascript" src="https://www.google.com/jsapi?autoload= 
+
+    <script type="text/javascript" src="https://www.google.com/jsapi?autoload=
 {'modules':[{'name':'visualization','version':'1.1','packages':
 ['corechart','table']}]}"></script>
     <script>
@@ -62,7 +62,7 @@
   <div class="div3">
     <div class="botoes">
       <button class="btn success" onclick="getStart()">INICIAR</button>
-      <button class="btn info" id="btnprox_etapa" disabled onclick="prox_etapa()">PROXIMA ETAPA</button>
+      <!-- <button class="btn info" id="btnprox_etapa" disabled onclick="prox_etapa()">PROXIMA ETAPA</button> -->
       <!-- <button class="btn danger" onclick="ajuda()">AJUDA</button> -->
       <button type="button" class="btn success" data-toggle="modal" data-target="#largeModal">CHAMADAS</button>
       <button class="btn danger" onclick=location.href="index.html">RETORNAR</button>
@@ -74,11 +74,11 @@
       </div>
       <div id ="chart_cell" >
         <select onchange='plotbyId(value)'  name='inptOndas'></select>
-        <div id="chart_poisson" style="width: 400px; height: 300px;"></div>  
-        <div id="tb_chamadas" style=" width: 40%; height: 300px;"></div>  
+        <div id="chart_poisson" style="width: 400px; height: 300px;"></div>
+        <div id="tb_chamadas" style=" width: 40%; height: 300px;"></div>
       </div>
     </div>
-    
+
   </div>
             <div class="modal fade" id="largeModal" tabindex="-1" role="dialog" aria-labelledby="largeModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
