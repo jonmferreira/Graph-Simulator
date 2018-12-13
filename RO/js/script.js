@@ -5,52 +5,42 @@ var game = new Phaser.Game(900, 411, Phaser.CANVAS, 'phaser-id',
 
 class Poisson{
 	constructor(quantidadeChamadas ,periodo, y){
-		this.fatoriais = [1];
 		this.y = y;
 		this.T =periodo; 
 		this.quantidadeChamadas = quantidadeChamadas;
-		this.initFatorial();
-
 	}
-	initFatorial(){
-		var sum=0,k;
-      	for ( k=1; k<= 45 ; k++){//fazer bignum
-	        sum+=k;
-	        if(sum>= this.quantidadeChamadas ){
-	        	break;
-	        }
-	    }
-	    var fat=1;
+	fator(num){
+	 var k = this.howK(num);
+	 var fat=1;
       	for(let x=1; x <= k; x++)
       	{
        	 fat = fat *x;
-       	 this.fatoriais.push(fat);
       	}
-	}
-	fator(num){
-      return this.fatoriais[num];
+      return fat;
     }
     howK(isIt){
       var sum=0;
-      for (let k=1; k<= 1100 ; k++){
+      isIt = isIt;
+      for (let k=1; k<= 500 ; k++){
         sum+=k;
         if(sum>=isIt){
           return k;
         }
       }
+
     }
     getPoissonFreq(ichamada){
       var k =this.howK(ichamada);
       var f1 = 1- ( 1.96/Math.sqrt( k +14) );
       f1= f1*( k + 15 )/ this.T;
-      return f1;
+      return f1/5;
     }
     getPoisson(ichamada){
       var k =this.howK(ichamada);
       var f = Math.exp(-this.y)* Math.pow( this.y, k);
       var fat = this.fator(k);
       f= f /fat;
-      return f;
+      return f*1000;
     }
 }
 class Grafo{
@@ -98,11 +88,11 @@ class Grafo{
 	}
 	criarEnlance(u,v,peso){
 		var ondas = [];
-		for( let i=1;i<= this.limiteOndas; i++){
+		for( let i=0;i<= this.limiteOndas; i++){
 			var onda = { onda:"y"+i,
 						 tempoReserva:0,
 						 isReservado:function(){
-						 	return tempoReserva !=0;
+						 	return this.tempoReserva !=0;
 						 },
 						 updateReserva: function(tempoDecorrido){
 						 	this.tempoReserva -= tempoDecorrido;
@@ -133,7 +123,7 @@ class Grafo{
 				 		
 				 },
 				 isOndaDisponivel: function(onda){
-				 	return this.ondasReservadas[onda].isReservado();
+				 	return  ! this.ondasReservadas[onda].isReservado();
 				 },
 				 reservar: function(onda,tempo){
 				 	this.ondasReservadas[onda].reservar(tempo);
@@ -153,14 +143,12 @@ class Grafo{
 	reservarEnlace(u,v,onda,tempo){
 		var cod = Grafo.toParCode(u,v);
 		let enlace = this.enlaces[ cod ];
-		if( enlace != null ){
+		if( enlace != null && this.isEnlaceDisponivel(u,v,onda) ){
 			enlace.reservar(onda,tempo);	
 			return "ok";
 		}else{
 			return "so bad";
-		}
-
-		
+		}		
 	}
 	reservarEnlaces( vet_caminho, onda, tempo ){
 		for( let i=0; i< vet_caminho.length -1; i++){
@@ -169,6 +157,22 @@ class Grafo{
 			}
 		}
 		return "ok";
+	}
+	isCaminhoDisponivel(vet_caminho){
+		var disponivel = false;
+		var j,i;
+		for( j=1; j <= this.limiteOndas && !disponivel; j++){
+			disponivel = true;
+			for(  i=0; i< vet_caminho.length -1 && disponivel; i++){
+				var u,v;
+				u = vet_caminho[i] + 1; v= vet_caminho[i+1]+1;
+				disponivel = this.isEnlaceDisponivel(u,v,j);
+			}
+			if (disponivel){
+				return j;
+			}
+		}
+		return -1;
 	}
 	updateTempoEnlaces(atualizaReserva){
 		this.enlaces.forEach( function(element, index, array){
@@ -181,7 +185,6 @@ class Grafo{
 		chaves.forEach(function(element, index, array){
 			this.enlaces[element].atualizaReserva(atualizaReserva);
 		});*/
-		
 	}
 	static toParCode(u,v){
 		if (u>v){
@@ -197,13 +200,13 @@ class GraphAlgoritms{
 		this.graph = grafo;
 	}
 	menorCaminho(origem,destino){
-		
 		var saida =  this.menorCaminho_init(origem-1,destino-1);
 		return saida;
 	}
 	menorCaminho_init(origem,destino){
 		this.saida = [];
 		this.caminho = [];
+		this.onda_encontrada=-1;
 	    var distancias = [];
 	    var visitados = [];
 	    var conj = [];
@@ -225,7 +228,7 @@ class GraphAlgoritms{
 			vetorDistacia: distancias,
 			custoPercusso:distancias[destino],
 			percusso: this.saida, 
-			onda_disponivel:0
+			onda_disponivel: this.onda_encontrada
 		}; 
 		
 		return obj_saida;
@@ -252,78 +255,114 @@ class GraphAlgoritms{
 			}
 		}
 	}
-	//TODO
-	isEnlaceDisponivel(onda_y){
-
-	}
 
 	atualizarCaminho(v,fim){
 		this.caminho.push(v);
 		if ( this.caminho[this.caminho.length-1] == fim){
-			this.saida=[];
-			for ( var i=0; i< this.caminho.length; i++){
-				this.saida.push(this.caminho[i]);
+			var onda = this.graph.isCaminhoDisponivel( this.caminho );
+			if( onda != -1){
+				this.onda_encontrada = onda;
+				this.saida=[];
+				for ( var i=0; i< this.caminho.length; i++){
+					this.saida.push( this.caminho[i] );
+				}
+				return true;	
 			}
-			return true;
 		}
 		return false;
 	}
 }
 //Talves essa funcção deva estar dentro de uma classe Redes Oticas//ultima prioridade
-function criarGrafoChamadas(quantidadeChamadas,ondas){
+var simulacoes =[];
+var limChamadas=0;
+function simularCenario_Otico(quantidadeChamadas,list_ondas, periodo){
 	//TODO precisa informar dados de Poisson
-	rd = new RedesOticas(points, dataLinhasPontos, quantidadeChamadas, ondas,24);//periodo = 24h
+	//periodo = 24h
 	//console.log(rd);
 	console.log("simulando cenario de RD");
-	var dados =rd.simularCenario();
-	console.log(dados);
-}
-//== no futuro passar tudo para duas classes
+	simulacoes =[];
+	for(let i=0;i< list_ondas.length;i++){
+		var rd = new RedesOticas(points, dataLinhasPontos, quantidadeChamadas,list_ondas[i],periodo);
+		var dados = rd.simularCenario( list_ondas[i] );
+		simulacoes.push(dados);
+	}
+	addOpcoes(list_ondas);
 
-class RedesOticas{
-	constructor(points, dataLinhasPontos, quantidade,ondasLim, periodoTeste){
-		this.points = points;
-		this.limiteOndas= ondasLim;
-		this.dataLinhasPontos = dataLinhasPontos;
-		this.quantidadeChamadas = quantidade;
-		this.calls = {};
-		this.periodoTeste = periodoTeste;
+	console.log(simulacoes);
+	limChamadas = quantidadeChamadas;
+	
+	plotGraficoErro(list_ondas,simulacoes);
+}
+function plotbyId(value){
+	if(limChamadas > 8000 ){
+		alert("Limite para plot é 8000 chamadas,devido aos limites do PC na fórmula de fatorial.");
+	}else{
+		plotGrafico(0,limChamadas,simulacoes[value]);	
 	}
-	//TODO:TEmos uma lista de ondas
-	simularCenario(){
-		this.grafoOtico = new Grafo(this.points.length);
-		this.grafoOtico.setConfigInit(this.dataLinhasPontos, this.limiteOndas );
-		this.calls = Chamadas.gerarChamadas(this.quantidadeChamadas, this.points.length, this.periodoTeste, 30);
-		this.calls.realizarVerificoes( this.grafoOtico );
-		this.plotGraficos();
-		return this.calls;
+}
+function addOpcoes(list_ondas){
+	var optionsAsString = "";
+	for(var i = 0; i < list_ondas.length; i++) {
+	    optionsAsString += "<option value='" + i + "'>" + list_ondas[i] + "</option>";
 	}
-	plotGraficos(){
-		google.charts.load('current', {'packages':['corechart','table']});
-		google.charts.setOnLoadCallback(this.drawVisualization(this.quantidadeChamadas,this.calls));
+	$("select[name='inptOndas']").find('option').remove().end().append($(optionsAsString));
+}
+function plotGraficoErro(list_ondas,simulacoes){
+	google.charts.load('current', {'packages':['corechart','table']});
+	google.charts.setOnLoadCallback(drawErro(list_ondas,simulacoes));
+}
+function drawErro(list_ondas,simulacoes){
+	var dataBloqueio = [['onda','%Bloqueio']];
+
+	
+	for (let i=0;i< simulacoes.length;i++ ){
+		var row=[list_ondas[i], simulacoes[i].prob_Erro()*100 ];
+		dataBloqueio.push(row);
 	}
-	drawVisualization(quantidadeChamadas,calls) {
+	data = google.visualization.arrayToDataTable(dataBloqueio);
+	options = {
+			  title : 'Probabilidade de bloqueio',
+			  backgroundColor: '#fff',
+			  pointSize: 0,
+			  vAxis: {title: '%'},
+			  hAxis: {title: 'Quantidade de comprimento de onda'},
+			  seriesType: 'bars',
+			  series: {0: {type: 'bars'}}
+			};
+	var chart = new google.visualization.ComboChart(document.getElementById('chart_prob_erro'));
+	chart.draw(data, options);
+}
+function plotGrafico(id,quantidadeChamadas,simulacao){
+	google.charts.load('current', {'packages':['corechart','table']});
+	if( id== 0 ){
+		google.charts.setOnLoadCallback(drawSimulation(quantidadeChamadas,simulacao));
+	}	
+}
+function drawSimulation(quantidadeChamadas,calls){
 			var dataPoisson = [['k', 'Tempo em Poisson',"frequência de confiança"]];
 			var rows = [];
-			var myPoisson = new Poisson( quantidadeChamadas, this.periodoTeste, 30);
+			var myPoisson = calls.myPoisson;
 			for (let c=0; c< quantidadeChamadas; c++){
 
 				var poissonFreq = myPoisson.getPoissonFreq(c);
 				var v = [];
 				v.push(c);
-				v.push(myPoisson.getPoisson(c)*100);//calculo de Poisson
+				v.push(myPoisson.getPoisson(c));//calculo de Poisson
 				v.push(poissonFreq);//f poisson
 
 				dataPoisson.push(v);
 				var verificacao =calls.verificacoes[c]; 
 				if(verificacao == null){
 					console.log("algo errado");
-					console.log("indece: ",c);
+					console.log("indice: ",c);
 				}
 				else{
-					rows.push( [true, verificacao.par,verificacao.getStr(), verificacao.distancia] );	
+					rows.push( [c+1,verificacao.sucessRoteamento,
+						verificacao.ondaAlocada!=null?"y"+verificacao.ondaAlocada:null , 
+						verificacao.par,verificacao.getStr(), 
+						verificacao.distancia, 
+						verificacao.tempoAlocado] );	
 				}
-				
 			}
 			data = google.visualization.arrayToDataTable(dataPoisson);
 
@@ -336,15 +375,21 @@ class RedesOticas{
 			  seriesType: 'line',
 			  series: {0: {type: 'line'}}
 			};
-			var dataTable = new google.visualization.DataTable();
-			//... add data here ...
-			dataTable.addColumn('boolean', 'Sucess?');
-			dataTable.addColumn('string', 'Enlace');
-			dataTable.addColumn('string', 'Rota');
-			dataTable.addColumn('number', 'Distancia');
-			dataTable.addRows(rows);
 			var chart = new google.visualization.ComboChart(document.getElementById('chart_poisson'));
 			chart.draw(data, options);
+
+
+			var dataTable = new google.visualization.DataTable();
+			//... add data here ...
+			dataTable.addColumn('number', 'i_call');
+			dataTable.addColumn('boolean', 'Sucess?');
+			dataTable.addColumn('string', 'y_onda');
+			dataTable.addColumn('string', 'Enlace');
+			dataTable.addColumn('string', 'Rota');
+			dataTable.addColumn('number', 'D(km)');
+			dataTable.addColumn('number', 'timeout');
+			dataTable.addRows(rows);
+			
 	        //chart = new google.visualization.ComboChart(document.getElementById('chart_prob_erro'));
 	        //chart.draw(data, options);
 	        //teste table
@@ -358,18 +403,42 @@ class RedesOticas{
 				'headerCell': 'gold-border',
 				'tableCell': '',
 				'rowNumberCell': 'underline-blue-font'};
-			var options = {'showRowNumber': true, 'allowHtml': true,'width':800 , 'cssClassNames': cssClassNames};
+			var options = {'showRowNumber': true,
+			 'allowHtml': true,
+			 'width':800 ,
+			  'cssClassNames': cssClassNames};
 
 			var table = new google.visualization.Table(document.getElementById('tb_chamadas'));
 			table.draw(dataTable, options);
-	    }
+}
+//== no futuro passar tudo para duas classes
+
+class RedesOticas{
+	constructor(points, dataLinhasPontos, quantidade,ondasLim, periodoTeste){
+		this.points = points;
+		this.limiteOndas= ondasLim;
+		this.dataLinhasPontos = dataLinhasPontos;
+		this.quantidadeChamadas = quantidade;
+		this.calls = {};
+		this.periodoTeste = periodoTeste;
+	}
+	simularCenario(limiteOndas){
+		this.grafoOtico = new Grafo(this.points.length);
+		this.grafoOtico.setConfigInit(this.dataLinhasPontos, limiteOndas );
+		this.calls = Chamadas.gerarChamadas(this.quantidadeChamadas, this.points.length, this.periodoTeste, limiteOndas);
+		this.calls.realizarVerificoes( this.grafoOtico );
+		return this.calls;
+	}	
 }
 
 class Chamadas{
 	constructor(quantidade, periodoTeste, y){
     	this.quantidade = quantidade;
+    	this.periodoTeste = periodoTeste;
+    	this.limOndas = y;
     	this.buscas = [];
     	this.verificacoes = [];
+    	this.bloqueios =0;
     	this.myPoisson = new Poisson(quantidade, periodoTeste, y);
 	}
 	getIndexChamada(u,v){
@@ -383,37 +452,41 @@ class Chamadas{
     	return disponivel;
     }
     realizarVerificoes( grafo ){
-    	
     	for( let i =0;i < this.quantidade;i++){
     		var graphAlgoritms = new GraphAlgoritms( grafo );
 			var u = this.verificacoes[i].u;
 			var v = this.verificacoes[i].v;
 			if (i != 0){
 				let tempoEspera = this.myPoisson.getPoissonFreq(i+1);
-				grafo.updateTempoEnlaces(tempoEspera);
-				//TODO: atualiza todos enlances;
+				grafo.updateTempoEnlaces(tempoEspera);//: atualiza todos enlances;
+				
 			}
 			var r = graphAlgoritms.menorCaminho( u, v );
-			//TODO: calcular aqui o tempo de chamada
-			let tempoReserva = this.myPoisson.getPoisson(i+1)*100;
+			let tempoReserva = this.myPoisson.getPoisson(i+1);//: calcular aqui o tempo de chamada
 			if(isNaN(tempoReserva)){
 				tempoReserva = 1;
 			}
-			//TODO: reservar aqui cada enlace do caminho na onda y com tempo tal
-			if ( r !=null){
-				if (grafo.reservarEnlaces(r.percusso, r.onda_disponivel,tempoReserva) == "so bad"){
+			if ( r !=null &&  r.onda_disponivel != -1){
+				if (grafo.reservarEnlaces(r.percusso, r.onda_disponivel,tempoReserva) == "so bad"){//: reservar aqui cada enlace do caminho na onda y com tempo tal
 					console.log("erro com caminho,onda,tempo");
 					console.log(r,tempoReserva);
 					console.log("u,v:",u,v);
 				}
+				//let indiceCall =  this.getIndexChamada(u,v);
+				
+				//this.buscas[indiceCall].addCaminho( r.percusso, r.custoPercusso);//TODO:adicionar na busca o tempo alocado
 			} 
-			//TODO: Isso se o retorno não retornou bloqueio ne.
-			this.verificacoes[i].setData( r.percusso, r.custoPercusso);
-			let indiceCall =  this.getIndexChamada(u,v);
-			//adicionar na busca o tempo alocado
-			this.buscas[indiceCall].addCaminho( r.percusso, r.custoPercusso);
+			var success = this.verificacoes[i].setData( r.percusso, r.custoPercusso,r.onda_disponivel,tempoReserva  );//: Isso se o retorno não retornou bloqueio ne.
+			this.bloqueios = this.bloqueios + ( success !=true?1:0 );
+			
+			if(r.onda_disponivel == -1){
+				console.log("deu bloq "+this.limOndas);	
+			}
 		}
 		return this.verificacoes;
+    }
+    prob_Erro(){
+    	return this.bloqueios/this.quantidade;
     }
     //TODO:CRIAR AQUI o tempo RANDOM
     static gerarRandomPar(limite){
@@ -434,14 +507,14 @@ class Chamadas{
 			var par = Chamadas.gerarRandomPar(totalPontos);
 			var u = par.u;
 			var v = par.v;
-			let j = chamadas.getIndexChamada(u,v);
+			/*let j = chamadas.getIndexChamada(u,v);
 			if( j == -1){
 				var chamada = new BuscaChamada(u,v);
 				chamadas.buscas.push(chamada);
 			}
 			else {
 				chamadas.buscas[j].solicitacao ++;
-			}
+			}*/
 
 			var verificacao = new VerificacaoChamada(u,v);
 			chamadas.verificacoes.push(verificacao);
@@ -481,14 +554,21 @@ class VerificacaoChamada{
 		this.caminho = "";
 		this.distancia= -1 ;
 	}
-	setData(caminho,distancia){
-		this.caminho = caminho;
-		this.distancia = distancia;
+	setData(caminho,distancia,ondaAlocada,tempoAlocado){
+		this.caminho = ondaAlocada !=-1?caminho:null;
+		this.distancia = ondaAlocada !=-1?distancia:null;
+		this.tempoAlocado = ondaAlocada !=-1?tempoAlocado:null;
+		this.ondaAlocada = ondaAlocada !=-1?ondaAlocada:null;
+		this.sucessRoteamento=  ondaAlocada !=-1? true: false;
+		return this.sucessRoteamento;
 	}
 	getStr(){
-		var src = ""+(this.caminho[0]+1);
-		for(let i=0; i< this.caminho.length; i++){
-			src = src +"-"+ (this.caminho[i]+1);
+		var src = "";
+		if(this.caminho != null){
+			 src = ""+(this.caminho[0]+1);
+			for(let i=0; i< this.caminho.length; i++){
+				src = src +"-"+ (this.caminho[i]+1);
+			}
 		}
 		return src;
 	}
@@ -872,7 +952,8 @@ function callMeBaby(){
 	var ondas = document.getElementById("quantidadeOnda").value;
 	quantidade = parseInt( calls );
 	if( quantidade>=1 &&  quantidade<=100000){
-		criarGrafoChamadas(quantidade,ondas);//alocar dados também de tempo de Poisson
+		list_ondas = [20,40,80,100];
+		simularCenario_Otico(quantidade, list_ondas, 24);//alocar dados também de tempo de Poisson
 		etapa.fase = 4;
 	}
 }

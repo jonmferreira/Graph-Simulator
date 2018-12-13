@@ -70,11 +70,12 @@
 
     <div class="container" id = "charts">
       <div id ="chart_cell" style=" margin: 64px;">
-         <div id="chart_poisson" style="width: 400px; height: 300px;"></div>    
-        <div id="chart_prob_erro" style="width: 400px; height: 300px;"></div> 
+        <div id="chart_prob_erro" style="width: 400px; height: 300px;"></div>
       </div>
       <div id ="chart_cell" >
-         <div id="tb_chamadas" style=" width: 50%; height: 400px;"></div> 
+        <select onchange='plotbyId(value)'  name='inptOndas'></select>
+        <div id="chart_poisson" style="width: 400px; height: 300px;"></div>  
+        <div id="tb_chamadas" style=" width: 40%; height: 300px;"></div>  
       </div>
     </div>
     
@@ -108,7 +109,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn danger" data-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn success" onclick="callMeBaby()">Confirm</button>
+                            <button type="button"  data-dismiss="modal" class="btn success" onclick="callMeBaby()">Confirm</button>
                         </div>
                     </div>
                 </div>

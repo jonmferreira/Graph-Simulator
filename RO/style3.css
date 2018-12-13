@@ -163,7 +163,17 @@
 
 
 .imagem-1{
-	margin-left: 1cm;
+	width: 100%;
+}
+img#img_pacificbell {
+    height: 225px;
+    width: 400px;
+
+}
+
+img#hue {
+    height: 225px;
+    width: 300px;
 }
 
 .imagem-1 button{
@@ -171,7 +181,7 @@
 }
 
 .imagem-2{
-	margin-left: 1cm;
+	width: 100%;
 }
 
 .imagem-2 button{
@@ -197,6 +207,9 @@ div#chart_prob_erro{
 }
 div#chart_3{
 
+}
+div#tb_chamadas {
+  
 }
 
 li {
