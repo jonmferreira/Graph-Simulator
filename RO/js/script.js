@@ -10,7 +10,6 @@ class Poisson{
 		this.quantidadeChamadas = quantidadeChamadas;
 	}
 	fator(num){
-	 var k = this.howK(num);
 	 var fat=1;
       	for(let x=1; x <= k; x++)
       	{
