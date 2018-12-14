@@ -194,13 +194,16 @@ img#hue {
 }
 
 div#charts {
-    display: table;
+    display: inline-flex;
 }
 div#chart_poisson {
     display: -webkit-inline-box;
 }
-div#chart_cell{
-	display: table-row;
+div#chart_cell1{
+	display: inline-table;
+}
+div#chart_cell2{
+	display: -webkit-inline-box;
 }
 div#chart_prob_erro{
 	display: -webkit-inline-box;
