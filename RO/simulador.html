@@ -68,13 +68,13 @@
       <button class="btn danger" onclick=location.href="index.html">RETORNAR</button>
     </div>
 
-    <div class="container" id = "charts">
-      <div id ="chart_cell" style=" margin: 64px;">
+    <div class="container" id = "charts" style=" margin-top: 4px;">
+      <div id ="chart_cell1" style=" margin-right: 8px;">
         <div id="chart_prob_erro" style="width: 400px; height: 300px;"></div>
+		<select onchange='plotbyId(value)' class="form-control"  name='inptOndas'></select>
       </div>
-      <div id ="chart_cell" >
-        <select onchange='plotbyId(value)'  name='inptOndas'></select>
-        <div id="chart_poisson" style="width: 400px; height: 300px;"></div>
+      <div id ="chart_cell2" >
+        <div id="chart_poisson" style="  margin-right: 8px; width: 400px; height: 300px;"></div>
         <div id="tb_chamadas" style=" width: 40%; height: 300px;"></div>
       </div>
     </div>
