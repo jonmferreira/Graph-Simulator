@@ -1,4 +1,4 @@
-﻿//================== Logica do phaser
+//================== Logica do phaser
 var game = new Phaser.Game(900, 391, Phaser.CANVAS, 'phaser-id',
  { preload: preload, create: create, update: update, render:render});
 
@@ -11,7 +11,7 @@ class Poisson{
 	}
 	fator(num){
 	 var fat=1;
-      	for(let x=1; x <= k; x++)
+      	for(let x=1; x <= num; x++)
       	{
        	 fat = fat *x;
       	}
@@ -19,7 +19,7 @@ class Poisson{
     }
     howK(isIt){
       var sum=0;
-      isIt = isIt;
+      isIt = isIt%700;
       for (let k=1; k<= 500 ; k++){
         sum+=k;
         if(sum>=isIt){
@@ -32,7 +32,7 @@ class Poisson{
       var k =this.howK(ichamada);
       var f1 = 1- ( 1.96/Math.sqrt( k +14) );
       f1= f1*( k + 15 )/ this.T;
-      return f1/5;
+      return f1/10;
     }
     getPoisson(ichamada){
       var k =this.howK(ichamada);
@@ -293,6 +293,7 @@ function simularCenario_Otico(quantidadeChamadas,list_ondas, periodo){
 	plotGraficoErro(list_ondas,simulacoes);
 }
 function plotbyId(value){
+	plotGrafico(0,limChamadas,simulacoes[value]);
 	if(limChamadas > 8000 ){
 		alert("Limite para plot é 8000 chamadas,devido aos limites do PC na fórmula de fatorial.");
 	}else{
@@ -501,7 +502,7 @@ class Chamadas{
     }
     static gerarChamadas(quantidade, totalPontos, periodoTeste, y ){
 
-	    var chamadas = new Chamadas(quantidade, periodoTeste, y);
+	    var chamadas = new Chamadas(quantidade, periodoTeste, 20);
 		for(var i=1;i<=quantidade;i++ ){
 			var par = Chamadas.gerarRandomPar(totalPontos);
 			var u = par.u;
